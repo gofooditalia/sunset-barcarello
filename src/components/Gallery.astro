@@ -1,0 +1,23 @@
+---
+// TODO: sostituire con le foto reali in public/images/gallery/
+const photos = Array.from({ length: 6 }, (_, i) => ({
+  src: `/images/gallery/${i + 1}.jpg`,
+  alt: `Sunset Barcarello - foto ${i + 1}`,
+}));
+---
+
+<section id="gallery" class="py-20 lg:py-28 px-6 bg-white">
+  <div class="max-w-[1200px] mx-auto">
+    <div class="text-center max-w-2xl mx-auto">
+      <p class="text-primary uppercase tracking-[0.3em] text-xs font-semibold mb-3">Gallery</p>
+      <h2 class="text-4xl lg:text-5xl font-bold text-navy">Uno sguardo da noi</h2>
+    </div>
+    <div class="mt-14 grid grid-cols-2 lg:grid-cols-3 gap-4">
+      {photos.map((p) => (
+        <div class="aspect-square rounded-xl overflow-hidden bg-cream">
+          <img src={p.src} alt={p.alt} class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,18 @@
+---
+import { site } from "../data/site";
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-navy text-white/70 py-10 px-6">
+  <div class="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-sm">
+    <div class="text-center sm:text-left">
+      <p class="text-white font-display text-lg">{site.name}</p>
+      <p>{site.address.street}, {site.address.zip} {site.address.city}</p>
+      <p class="mt-1">© {year} {site.name}. Tutti i diritti riservati.</p>
+    </div>
+    <a href="https://gofoodmenu.it" target="_blank" rel="noopener" class="flex items-center gap-2 hover:text-white transition-colors">
+      <span>Sviluppato da</span>
+      <img src="/gofood.svg" alt="GO!Food Italia" class="h-6" />
+    </a>
+  </div>
+</footer>

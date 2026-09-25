@@ -1,0 +1,41 @@
+---
+import { Fish, Pizza, Martini } from "lucide-astro";
+import { site } from "../data/site";
+
+const facts = [
+  { icon: Fish, title: "Crudo di mare", text: "Tartare, ostriche e gambero rosso di Mazara, freschissimi." },
+  { icon: Pizza, title: "Pizzeria", text: "Pizze classiche e proposte della casa, cotte al momento." },
+  { icon: Martini, title: "Aperitivo al tramonto", text: "Cocktail bar con la vista più bella di Barcarello." },
+];
+---
+
+<section id="storia" class="relative py-20 lg:py-28 px-6 bg-navy text-white overflow-hidden">
+  <div class="relative z-10 max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-12 items-center">
+    <div>
+      <p class="text-gold uppercase tracking-[0.3em] text-xs font-semibold mb-3">Chi siamo</p>
+      <h2 class="text-4xl lg:text-5xl font-bold leading-tight">Il mare, la pizza, il tramonto</h2>
+      <p class="mt-6 text-lg text-white/75 leading-relaxed">
+        <!-- TODO: storia reale del locale, raccontata dal cliente -->
+        {site.shortName} Barcarello è pizzeria, ristorante e apericena affacciata sul mare di Palermo, nel tratto di costa di Barcarello. Cucina di mare, crudi freschissimi e pizza, da gustare mentre il sole tramonta sull'acqua.
+      </p>
+      <p class="mt-4 text-lg text-white/75 leading-relaxed">
+        Perfetto per un aperitivo tra amici, una cena in coppia o una tavolata da condividere, con vista che cambia colore a ogni ora.
+      </p>
+    </div>
+
+    <!-- TODO: quando disponibili, sostituire con una foto reale del locale (public/images/about.jpg) -->
+    <ul class="grid gap-4">
+      {facts.map((f) => (
+        <li class="flex items-start gap-5 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <span class="size-12 shrink-0 rounded-xl bg-primary/20 text-gold flex items-center justify-center">
+            <f.icon class="size-6" />
+          </span>
+          <div>
+            <h3 class="text-xl font-bold">{f.title}</h3>
+            <p class="text-white/70 mt-1">{f.text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

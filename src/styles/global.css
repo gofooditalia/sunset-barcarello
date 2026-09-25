@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Identità Sunset Barcarello: tramonto sul mare di Palermo */
+@theme {
+  --color-primary: #e85d2c;      /* arancio tramonto */
+  --color-primary-dark: #b8431c;
+  --color-navy: #0c2436;         /* blu notte / mare profondo */
+  --color-navy-light: #163a54;
+  --color-gold: #f2b705;         /* bagliore del sole */
+  --color-cream: #fff7ed;
+  --color-neutral-text: #241a12;
+
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-sans-main: "Inter Variable", system-ui, sans-serif;
+}
+
+:root {
+  background-color: var(--color-navy);
+  color: var(--color-neutral-text);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: var(--font-sans-main);
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+}

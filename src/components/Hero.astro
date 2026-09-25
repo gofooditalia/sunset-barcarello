@@ -1,0 +1,110 @@
+---
+import { ChevronDown } from "lucide-astro";
+import { site } from "../data/site";
+---
+
+<section id="home" class="hero relative min-h-svh flex items-end justify-center overflow-hidden">
+  <div class="hero-sky absolute inset-0" aria-hidden="true"></div>
+  <div class="hero-sun absolute" aria-hidden="true"></div>
+  <div class="hero-scrim absolute inset-0" aria-hidden="true"></div>
+  <div class="hero-reflection absolute bottom-0 left-1/2 -translate-x-1/2" aria-hidden="true"></div>
+
+  <svg class="hero-sea absolute bottom-0 left-0 w-full h-[26vh] min-h-[150px] max-h-[240px]" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#0c2436" d="M0,96 C240,160 480,32 720,64 C960,96 1200,192 1440,128 L1440,220 L0,220 Z" />
+  </svg>
+
+  <div class="relative z-30 text-center px-6 pb-28 lg:pb-36 max-w-3xl">
+    <p class="uppercase tracking-[0.35em] text-gold text-xs lg:text-sm font-semibold mb-5">Barcarello · Palermo</p>
+    <h1 class="hero-title font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.05]">
+      Sunset<br /><span class="text-gold">Barcarello</span>
+    </h1>
+    <p class="mt-6 text-lg lg:text-xl text-white/90 leading-relaxed">
+      {site.tagline}. Crudo di mare, pizza e cocktail, davanti al tramonto più bello della costa.
+    </p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <a
+        href={site.menuUrl}
+        target="_blank"
+        rel="noopener"
+        class="inline-flex rounded-lg h-13 px-8 items-center bg-primary text-white font-black tracking-widest uppercase text-sm hover:bg-primary-dark transition-all shadow-lg shadow-primary/40 active:scale-95"
+      >
+        Vedi il menu
+      </a>
+      <a
+        href="#contatti"
+        class="inline-flex rounded-lg h-13 px-8 items-center border-2 border-white/70 text-white font-black tracking-widest uppercase text-sm hover:bg-white/10 transition-all active:scale-95"
+      >
+        Come raggiungerci
+      </a>
+    </div>
+    {site.rating?.value && (
+      <p class="mt-9 text-white/75 text-sm">
+        ⭐ {site.rating.value} su Google · {site.rating.count} recensioni
+      </p>
+    )}
+  </div>
+
+  <a href="#storia" class="absolute z-30 bottom-6 left-1/2 -translate-x-1/2 text-white/80 hover:text-white transition-colors animate-bounce" aria-label="Scorri per saperne di più">
+    <ChevronDown class="size-8" />
+  </a>
+</section>
+
+<style>
+  .hero-sky {
+    background: linear-gradient(
+      to bottom,
+      var(--color-navy) 0%,
+      #3a1f3d 24%,
+      var(--color-primary-dark) 46%,
+      var(--color-primary) 64%,
+      var(--color-gold) 82%,
+      var(--color-gold) 100%
+    );
+  }
+
+  .hero-sun {
+    left: 50%;
+    top: 46%;
+    width: clamp(160px, 24vw, 360px);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 9999px;
+    background: radial-gradient(circle at 50% 50%, #fff7d6 0%, var(--color-gold) 38%, var(--color-primary) 78%, transparent 100%);
+    box-shadow: 0 0 140px 50px rgba(242, 183, 5, 0.35);
+    animation: sun-glow 6s ease-in-out infinite;
+    z-index: 10;
+  }
+
+  .hero-scrim {
+    background: radial-gradient(ellipse 60% 45% at 50% 38%, rgba(6, 14, 22, 0.55) 0%, rgba(6, 14, 22, 0.2) 55%, transparent 75%);
+    z-index: 15;
+  }
+
+  .hero-title {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.55), 0 8px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .hero-reflection {
+    width: clamp(60px, 10vw, 140px);
+    height: 26vh;
+    min-height: 150px;
+    max-height: 240px;
+    background: linear-gradient(to bottom, rgba(242, 183, 5, 0.55), rgba(242, 183, 5, 0));
+    filter: blur(6px);
+    z-index: 20;
+  }
+
+  .hero-sea {
+    z-index: 21;
+  }
+
+  @keyframes sun-glow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-sun { animation: none; }
+    .animate-bounce { animation: none; }
+  }
+</style>

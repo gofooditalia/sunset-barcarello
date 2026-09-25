@@ -1,0 +1,64 @@
+---
+import { MapPin, Phone, Clock, Instagram, Facebook } from "lucide-astro";
+import { site } from "../data/site";
+
+const { lat, lng } = site.address;
+const mapSrc = `https://www.google.com/maps?q=${lat},${lng}&z=17&hl=it&output=embed`;
+---
+
+<section id="contatti" class="py-20 lg:py-28 px-6 bg-cream">
+  <div class="max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-12">
+    <div>
+      <p class="text-primary uppercase tracking-[0.3em] text-xs font-semibold mb-3">Dove siamo</p>
+      <h2 class="text-4xl lg:text-5xl font-bold text-navy">Vieni a trovarci</h2>
+
+      <ul class="mt-10 space-y-6 text-lg text-navy">
+        <li class="flex gap-4">
+          <MapPin class="size-6 text-primary shrink-0 mt-1" />
+          <a href={site.address.mapsUrl} target="_blank" rel="noopener" class="hover:text-primary transition-colors">
+            {site.address.street}<br />{site.address.zip} {site.address.city}
+          </a>
+        </li>
+        {site.phone && (
+          <li class="flex gap-4">
+            <Phone class="size-6 text-primary shrink-0 mt-1" />
+            <a href={`tel:${site.phone.replace(/\s/g, "")}`} class="hover:text-primary transition-colors">{site.phone}</a>
+          </li>
+        )}
+        <li class="flex gap-4">
+          <Clock class="size-6 text-primary shrink-0 mt-1" />
+          <div>
+            <p class="text-sm text-primary font-semibold mb-1">{site.openingNotice}</p>
+            {site.hours.map((h) => (
+              <div class="flex gap-4"><span class="w-44 font-semibold">{h.days}</span><span>{h.time}</span></div>
+            ))}
+          </div>
+        </li>
+      </ul>
+
+      <div class="flex flex-wrap gap-4 mt-10">
+        {site.whatsapp && (
+          <a href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener" class="rounded-lg h-12 px-6 flex items-center bg-navy text-white font-bold hover:opacity-90 transition-opacity">
+            Scrivici su WhatsApp
+          </a>
+        )}
+        {site.social.instagram && (
+          <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Instagram" class="size-12 rounded-lg border border-navy/15 text-navy flex items-center justify-center hover:border-primary hover:text-primary transition-colors"><Instagram class="size-5" /></a>
+        )}
+        {site.social.facebook && (
+          <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Facebook" class="size-12 rounded-lg border border-navy/15 text-navy flex items-center justify-center hover:border-primary hover:text-primary transition-colors"><Facebook class="size-5" /></a>
+        )}
+      </div>
+    </div>
+
+    <div class="rounded-2xl overflow-hidden bg-white min-h-80 shadow-md">
+      <iframe
+        title={`Mappa ${site.name}`}
+        src={mapSrc}
+        class="w-full h-full min-h-80 border-0"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+  </div>
+</section>
