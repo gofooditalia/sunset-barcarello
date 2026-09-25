@@ -70,8 +70,18 @@ const links = [
   closeBtn?.addEventListener("click", () => toggle(false));
   menu?.querySelectorAll(".mobile-link").forEach((a) => a.addEventListener("click", () => toggle(false)));
 
+  function getThreshold() {
+    // Sopra l'hero scroll-scrub: resta trasparente per tutta la durata dell'animazione,
+    // non solo per i primi 40px. Fallback (mobile / riduci animazioni): soglia classica.
+    const hero = document.querySelector<HTMLElement>(".hero-scrub");
+    if (hero?.classList.contains("is-scrub-active")) {
+      return Math.max(40, hero.offsetHeight - window.innerHeight);
+    }
+    return 40;
+  }
+
   const onScroll = () => {
-    const scrolled = window.scrollY > 40;
+    const scrolled = window.scrollY > getThreshold();
     navbar?.classList.toggle("bg-navy/70", scrolled);
     navbar?.classList.toggle("backdrop-blur-lg", scrolled);
     navbar?.classList.toggle("backdrop-saturate-150", scrolled);
@@ -80,5 +90,12 @@ const links = [
     navbar?.classList.toggle("shadow-md", scrolled);
   };
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
   onScroll();
+  // L'hero attiva lo scrub in modo asincrono (dopo il preload dei fotogrammi):
+  // ricalcola la soglia quando succede, così la navbar non "scatta" opaca nel frattempo.
+  const heroEl = document.querySelector(".hero-scrub");
+  if (heroEl) {
+    new MutationObserver(onScroll).observe(heroEl, { attributes: true, attributeFilter: ["class"] });
+  }
 </script>

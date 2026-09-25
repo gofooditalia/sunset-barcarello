@@ -1,110 +1,267 @@
 ---
-import { ChevronDown } from "lucide-astro";
 import { site } from "../data/site";
+
+// Sequenza di fotogrammi per lo scroll-scrub (estratti da public/video/sunset.mp4, 30fps/10s).
+const FRAME_COUNT = 300;
+const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0")}.webp`;
 ---
 
-<section id="home" class="hero relative min-h-svh flex items-end justify-center overflow-hidden">
-  <div class="hero-sky absolute inset-0" aria-hidden="true"></div>
-  <div class="hero-sun absolute" aria-hidden="true"></div>
-  <div class="hero-scrim absolute inset-0" aria-hidden="true"></div>
-  <div class="hero-reflection absolute bottom-0 left-1/2 -translate-x-1/2" aria-hidden="true"></div>
+<section id="home" class="hero-scrub relative bg-navy" data-frame-count={FRAME_COUNT}>
+  <div class="hero-scrub__pin sticky top-0 h-svh overflow-hidden flex items-end justify-center">
+    <canvas class="hero-scrub__canvas absolute inset-0 size-full" aria-hidden="true"></canvas>
+    <video
+      class="hero-scrub__video absolute inset-0 size-full object-cover hidden"
+      muted
+      playsinline
+      loop
+      aria-hidden="true"
+    >
+      <source src="/video/sunset.mp4" />
+    </video>
+    <img
+      class="hero-scrub__poster absolute inset-0 size-full object-cover"
+      src={framePath(1)}
+      alt=""
+      aria-hidden="true"
+      fetchpriority="high"
+    />
 
-  <svg class="hero-sea absolute bottom-0 left-0 w-full h-[26vh] min-h-[150px] max-h-[240px]" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
-    <path fill="#0c2436" d="M0,96 C240,160 480,32 720,64 C960,96 1200,192 1440,128 L1440,220 L0,220 Z" />
-  </svg>
+    <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/5 to-navy/20"></div>
 
-  <div class="relative z-30 text-center px-6 pt-24 pb-28 lg:pb-36 max-w-3xl">
-    <p class="uppercase tracking-[0.35em] text-gold text-xs lg:text-sm font-semibold mb-5">Barcarello · Palermo</p>
-    <h1 class="hero-title">
-      <img src="/images/logo-bianco.webp" alt={site.name} width="1000" height="419" class="mx-auto w-full max-w-xs sm:max-w-sm lg:max-w-md h-auto" />
-    </h1>
-    <p class="mt-6 text-lg lg:text-xl text-white/90 leading-relaxed">
-      {site.tagline}. Crudo di mare, pizza e cocktail, davanti al tramonto più bello della costa.
-    </p>
-    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-      <a
-        href={site.menuUrl}
-        target="_blank"
-        rel="noopener"
-        class="inline-flex rounded-lg h-13 px-8 items-center bg-primary text-white font-black tracking-widest uppercase text-sm hover:bg-primary-dark transition-all shadow-lg shadow-primary/40 active:scale-95"
-      >
-        Vedi il menu
-      </a>
-      <a
-        href="#contatti"
-        class="inline-flex rounded-lg h-13 px-8 items-center border-2 border-white/70 text-white font-black tracking-widest uppercase text-sm hover:bg-white/10 transition-all active:scale-95"
-      >
-        Come raggiungerci
-      </a>
-    </div>
-    {site.rating?.value && (
-      <p class="mt-9 text-white/75 text-sm">
-        ⭐ {site.rating.value} su Google · {site.rating.count} recensioni
+    <div class="hero-scrub__content relative z-10 text-center px-6 max-w-2xl mx-auto pb-16 lg:pb-24">
+      <h1 class="sr-only">{site.name} - Barcarello, Palermo</h1>
+
+      <p class="mt-6 text-white text-lg sm:text-xl max-w-xl mx-auto text-shadow">
+        {site.tagline}. Crudo di mare, pizza e cocktail, davanti al tramonto più bello della costa.
       </p>
-    )}
-  </div>
 
-  <a href="#storia" class="absolute z-30 bottom-6 left-1/2 -translate-x-1/2 text-white/80 hover:text-white transition-colors animate-bounce" aria-label="Scorri per saperne di più">
-    <ChevronDown class="size-8" />
-  </a>
+      <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
+        <a
+          href={site.menuUrl}
+          target="_blank"
+          rel="noopener"
+          class="inline-flex rounded-lg h-13 px-8 items-center bg-primary text-white font-black tracking-widest uppercase text-sm hover:bg-primary-dark transition-all shadow-lg shadow-primary/40 active:scale-95"
+        >
+          Vedi il menu
+        </a>
+        <a
+          href="#contatti"
+          class="inline-flex rounded-lg h-13 px-8 items-center border-2 border-white/70 text-white font-black tracking-widest uppercase text-sm hover:bg-white/10 transition-all active:scale-95"
+        >
+          Come raggiungerci
+        </a>
+      </div>
+
+      {site.rating?.value && (
+        <p class="mt-8 text-white/80 text-sm text-shadow">
+          ⭐ {site.rating.value} su Google · {site.rating.count} recensioni
+        </p>
+      )}
+    </div>
+  </div>
 </section>
 
+<noscript>
+  <style>
+    .hero-scrub { height: 100svh !important; }
+    .hero-scrub__content { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+  </style>
+</noscript>
+
+<script is:inline>
+  // Bloccante (non-module): gira PRIMA del primo paint, quindi decide subito se questa è
+  // una sessione desktop scroll-scrub (contenuto nascosto via CSS di default, vedi sotto)
+  // o una sessione fallback (mobile / riduci animazioni: va rivelato subito, senza attese).
+  // Evita qualsiasi lampeggio di testo/pulsanti, a differenza di uno script module deferred.
+  (function () {
+    var section = document.querySelector(".hero-scrub");
+    if (!section) return;
+    var frameCount = Number(section.dataset.frameCount || 0);
+    var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var isMobile = window.innerWidth < 768;
+    if (prefersReducedMotion || isMobile || !frameCount) {
+      section.classList.add("is-content-visible");
+    } else {
+      section.classList.add("is-scrub-active");
+    }
+  })();
+</script>
+
 <style>
-  .hero-sky {
-    background: linear-gradient(
-      to bottom,
-      var(--color-navy) 0%,
-      #3a1f3d 24%,
-      var(--color-primary-dark) 46%,
-      var(--color-primary) 64%,
-      var(--color-gold) 82%,
-      var(--color-gold) 100%
-    );
+  /* Nascosto di default: si assume la modalità scroll-scrub (il caso desktop più comune).
+     Lo script inline sopra aggiunge is-content-visible PRIMA del primo paint per i casi
+     fallback (mobile / riduci animazioni), quindi qui non c'è mai un lampeggio visibile. */
+  .hero-scrub {
+    height: 100svh;
   }
 
-  .hero-sun {
-    left: 50%;
-    top: 46%;
-    width: clamp(160px, 24vw, 360px);
-    aspect-ratio: 1;
-    transform: translate(-50%, -50%);
-    border-radius: 9999px;
-    background: radial-gradient(circle at 50% 50%, #fff7d6 0%, var(--color-gold) 38%, var(--color-primary) 78%, transparent 100%);
-    box-shadow: 0 0 140px 50px rgba(242, 183, 5, 0.35);
-    animation: sun-glow 6s ease-in-out infinite;
-    z-index: 10;
+  .hero-scrub__content {
+    opacity: 0;
+    transform: translateY(24px);
+    pointer-events: none;
   }
 
-  .hero-scrim {
-    background: radial-gradient(ellipse 60% 45% at 50% 38%, rgba(6, 14, 22, 0.55) 0%, rgba(6, 14, 22, 0.2) 55%, transparent 75%);
-    z-index: 15;
+  .hero-scrub__content.is-visible {
+    pointer-events: auto;
   }
 
-  .hero-title img {
-    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.55)) drop-shadow(0 8px 30px rgba(0, 0, 0, 0.4));
+  .hero-scrub__canvas {
+    display: none;
   }
 
-  .hero-reflection {
-    width: clamp(60px, 10vw, 140px);
-    height: 26vh;
-    min-height: 150px;
-    max-height: 240px;
-    background: linear-gradient(to bottom, rgba(242, 183, 5, 0.55), rgba(242, 183, 5, 0));
-    filter: blur(6px);
-    z-index: 20;
+  /* Modalità desktop: canvas scroll-scrub. */
+  .hero-scrub.is-scrub-active {
+    height: 300vh;
   }
 
-  .hero-sea {
-    z-index: 21;
+  .hero-scrub.is-frames-ready .hero-scrub__canvas {
+    display: block;
   }
 
-  @keyframes sun-glow {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.85; }
+  .hero-scrub.is-frames-ready .hero-scrub__poster {
+    display: none;
   }
 
+  /* Modalità mobile / riduci animazioni: video normale in autoplay, contenuto sempre visibile. */
+  .hero-scrub.is-content-visible .hero-scrub__content {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .hero-scrub.is-video-active .hero-scrub__video {
+    display: block;
+  }
+
+  .hero-scrub.is-video-active .hero-scrub__poster {
+    display: none;
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Rete di sicurezza puramente CSS: se lo script inline non parte (es. CSP che blocca
+     inline script), un utente con "riduci animazioni" non resta comunque con testo nascosto. */
   @media (prefers-reduced-motion: reduce) {
-    .hero-sun { animation: none; }
-    .animate-bounce { animation: none; }
+    .hero-scrub:not(.is-content-visible) {
+      height: 100svh;
+    }
+    .hero-scrub:not(.is-content-visible) .hero-scrub__content {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
   }
 </style>
+
+<script>
+  function framePath(n: number) {
+    return `/frames/hero/frame-${String(n).padStart(4, "0")}.webp`;
+  }
+
+  function initHeroVideoFallback(section: HTMLElement) {
+    const video = section.querySelector<HTMLVideoElement>(".hero-scrub__video");
+    if (!video) return;
+    section.classList.add("is-video-active");
+    video.play().catch(() => {});
+  }
+
+  function initHeroScrub(section: HTMLElement, frameCount: number) {
+    const pin = section.querySelector<HTMLElement>(".hero-scrub__pin");
+    const canvas = section.querySelector<HTMLCanvasElement>(".hero-scrub__canvas");
+    const content = section.querySelector<HTMLElement>(".hero-scrub__content");
+    if (!pin || !canvas || !content) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const images: HTMLImageElement[] = new Array(frameCount);
+    let loadedCount = 0;
+    let currentFrame = 1;
+    let ticking = false;
+    const revealStart = 0.7; // inizio fade-in testo/CTA (% di scroll dell'hero)
+    const revealEnd = 0.85; // fade-in completato (contenuto pienamente rivelato)
+
+    function resizeCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas!.width = window.innerWidth * dpr;
+      canvas!.height = window.innerHeight * dpr;
+      drawFrame(currentFrame);
+    }
+
+    function drawFrame(index: number) {
+      const img = images[index - 1];
+      if (!img || !img.complete || img.naturalWidth === 0) return;
+      currentFrame = index;
+      const canvasW = canvas!.width;
+      const canvasH = canvas!.height;
+      const scale = Math.max(canvasW / img.naturalWidth, canvasH / img.naturalHeight);
+      const drawW = img.naturalWidth * scale;
+      const drawH = img.naturalHeight * scale;
+      const dx = (canvasW - drawW) / 2;
+      const dy = (canvasH - drawH) / 2;
+      ctx!.clearRect(0, 0, canvasW, canvasH);
+      ctx!.drawImage(img, dx, dy, drawW, drawH);
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrollableDistance = section.offsetHeight - window.innerHeight;
+        const scrolled = -section.getBoundingClientRect().top;
+        const progress = scrollableDistance > 0
+          ? Math.min(1, Math.max(0, scrolled / scrollableDistance))
+          : 0;
+
+        const frameIndex = Math.min(frameCount, Math.max(1, Math.round(progress * (frameCount - 1)) + 1));
+        drawFrame(frameIndex);
+
+        const reveal = Math.min(1, Math.max(0, (progress - revealStart) / (revealEnd - revealStart)));
+        content!.style.opacity = String(reveal);
+        content!.style.transform = `translateY(${(1 - reveal) * 24}px)`;
+        content!.classList.toggle("is-visible", reveal > 0.5);
+
+        ticking = false;
+      });
+    }
+
+    // Precarica tutti i fotogrammi; attiva lo scrub solo quando sono pronti.
+    for (let i = 1; i <= frameCount; i++) {
+      const img = new Image();
+      img.onload = () => {
+        loadedCount++;
+        if (i === 1) {
+          resizeCanvas();
+        }
+        if (loadedCount === frameCount) {
+          section.classList.add("is-frames-ready");
+          window.addEventListener("scroll", onScroll, { passive: true });
+          window.addEventListener("resize", resizeCanvas, { passive: true });
+          resizeCanvas();
+          onScroll();
+        }
+      };
+      img.src = framePath(i);
+      images[i - 1] = img;
+    }
+  }
+
+  function init() {
+    const section = document.querySelector<HTMLElement>(".hero-scrub");
+    if (!section) return;
+
+    // La modalità è già stata decisa dallo script inline (prima del primo paint):
+    // qui leggiamo semplicemente quale classe ha impostato, senza rivalutare nulla.
+    if (section.classList.contains("is-content-visible")) {
+      initHeroVideoFallback(section);
+      return;
+    }
+
+    const frameCount = Number(section.dataset.frameCount || 0);
+    initHeroScrub(section, frameCount);
+  }
+
+  init();
+</script>
