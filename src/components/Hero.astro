@@ -1,8 +1,9 @@
 ---
 import { site } from "../data/site";
 
-// Sequenza di fotogrammi per lo scroll-scrub (estratti da public/video/sunset.mp4, 30fps/10s).
-const FRAME_COUNT = 300;
+// Sequenza di fotogrammi per lo scroll-scrub: ripresa unificata (terrazza di Sunset in dissolvenza
+// verso il mare/isola delle Femmine, la stessa vista dai tavolini), 30fps/17.27s, 518 frame.
+const FRAME_COUNT = 518;
 const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0")}.webp`;
 ---
 
@@ -16,7 +17,7 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
       loop
       aria-hidden="true"
     >
-      <source src="/video/sunset.mp4" />
+      <source src="/video/sunset-hero.mp4" />
     </video>
     <img
       class="hero-scrub__poster absolute inset-0 size-full object-cover"
