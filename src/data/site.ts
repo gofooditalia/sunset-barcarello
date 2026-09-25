@@ -17,7 +17,7 @@ export const site = {
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=38.206468,13.2825593",
   },
   phone: "366 332 9565",
-  whatsapp: "",         // TODO: confermare se il numero è raggiungibile anche su WhatsApp
+  whatsapp: "393663329565", // stesso numero, raggiungibile su WhatsApp: usato anche dal modulo prenotazioni
   email: "",            // TODO
   // Confermato su Google: "Apre alle ore 17:30". Fasce orarie e giorno di chiusura da confermare.
   openingNotice: "Aperti la sera, dalle 17:30",

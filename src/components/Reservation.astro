@@ -1,0 +1,124 @@
+---
+import { site } from "../data/site";
+
+// Orari proposti in linea con l'apertura reale del locale (site.openingNotice: "dalle 17:30").
+const times = [
+  "17:30", "18:00", "18:30", "19:00", "19:30", "20:00",
+  "20:30", "21:00", "21:30", "22:00", "22:30", "23:00",
+];
+---
+
+<section id="prenota" class="py-20 lg:py-28 px-6 bg-cream">
+  <div class="max-w-xl mx-auto">
+    <div class="text-center">
+      <p class="text-primary uppercase tracking-[0.3em] text-xs font-semibold mb-3">Prenota</p>
+      <h2 class="text-4xl lg:text-5xl font-bold text-navy">Prenota un tavolo</h2>
+      <p class="mt-4 text-neutral-text/75 text-lg">Compila il modulo: apriremo WhatsApp con il messaggio già pronto da inviarci.</p>
+    </div>
+
+    <form id="reservation-form" class="mt-12 rounded-2xl border border-navy/10 bg-white p-8 space-y-4">
+      <div>
+        <label for="res-name" class="block text-sm font-semibold text-navy mb-2">Nome e cognome</label>
+        <input
+          type="text"
+          id="res-name"
+          name="name"
+          required
+          placeholder="Mario Rossi"
+          class="w-full h-12 px-4 rounded-lg border border-navy/15 focus:outline-none focus:ring-2 focus:ring-primary bg-cream/40 text-navy placeholder:text-navy/40"
+        />
+      </div>
+
+      <div>
+        <label for="res-phone" class="block text-sm font-semibold text-navy mb-2">Telefono</label>
+        <input
+          type="tel"
+          id="res-phone"
+          name="phone"
+          required
+          placeholder="333 123 4567"
+          class="w-full h-12 px-4 rounded-lg border border-navy/15 focus:outline-none focus:ring-2 focus:ring-primary bg-cream/40 text-navy placeholder:text-navy/40"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="res-date" class="block text-sm font-semibold text-navy mb-2">Data</label>
+          <input
+            type="date"
+            id="res-date"
+            name="date"
+            required
+            class="w-full h-12 px-4 rounded-lg border border-navy/15 focus:outline-none focus:ring-2 focus:ring-primary bg-cream/40 text-navy"
+          />
+        </div>
+        <div>
+          <label for="res-time" class="block text-sm font-semibold text-navy mb-2">Ora</label>
+          <select
+            id="res-time"
+            name="time"
+            required
+            class="w-full h-12 px-4 rounded-lg border border-navy/15 focus:outline-none focus:ring-2 focus:ring-primary bg-cream/40 text-navy"
+          >
+            <option value="" disabled selected>Seleziona</option>
+            {times.map((t) => <option value={t}>{t}</option>)}
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label for="res-guests" class="block text-sm font-semibold text-navy mb-2">Persone</label>
+        <input
+          type="number"
+          id="res-guests"
+          name="guests"
+          required
+          min="1"
+          max="30"
+          value="2"
+          class="w-full h-12 px-4 rounded-lg border border-navy/15 focus:outline-none focus:ring-2 focus:ring-primary bg-cream/40 text-navy"
+        />
+      </div>
+
+      <div>
+        <label for="res-notes" class="block text-sm font-semibold text-navy mb-2">Note <span class="font-normal text-navy/50">(facoltativo)</span></label>
+        <textarea
+          id="res-notes"
+          name="notes"
+          rows="3"
+          placeholder="Allergie, intolleranze o richieste particolari"
+          class="w-full px-4 py-3 rounded-lg border border-navy/15 focus:outline-none focus:ring-2 focus:ring-primary bg-cream/40 text-navy placeholder:text-navy/40"
+        ></textarea>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full h-13 rounded-lg bg-primary text-white font-black tracking-widest uppercase text-sm hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 active:scale-95"
+      >
+        Invia su WhatsApp
+      </button>
+    </form>
+  </div>
+</section>
+
+<script define:vars={{ whatsapp: site.whatsapp, venueName: site.name }}>
+  const form = document.getElementById("reservation-form");
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+
+    const message = `Prenotazione tavolo - ${venueName}
+-------------------------
+Nome: ${data.get("name")}
+Data: ${data.get("date")}
+Ora: ${data.get("time")}
+Persone: ${data.get("guests")}
+Telefono: ${data.get("phone")}
+-------------------------
+Note: ${data.get("notes") || "Nessuna nota"}`;
+
+    const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+  });
+</script>
