@@ -16,8 +16,8 @@ const links = [
   class="fixed top-0 left-0 w-full z-50 px-6 lg:px-10 py-4 transition-all duration-500"
 >
   <div class="max-w-[1200px] mx-auto flex items-center justify-between">
-    <a href="/" class="nav-link flex items-center gap-2 font-display text-xl font-bold tracking-wide text-white" aria-label={site.name}>
-      Sunset <span class="text-gold">Barcarello</span>
+    <a href="/" class="nav-link flex items-center" aria-label={site.name}>
+      <img src="/images/logo-bianco-sm.webp" alt={site.name} width="500" height="210" class="h-10 lg:h-12 w-auto" />
     </a>
 
     <nav class="hidden lg:flex items-center gap-8">
@@ -43,7 +43,7 @@ const links = [
     <button id="mobile-menu-close" class="absolute top-5 right-6 p-2 text-white" aria-label="Chiudi menu">
       <X class="size-8" />
     </button>
-    <p class="font-display text-2xl font-bold text-white">Sunset <span class="text-gold">Barcarello</span></p>
+    <img src="/images/logo-bianco.webp" alt={site.name} width="1000" height="419" class="h-16 w-auto" />
     {links.map((l) => (
       <a href={l.href} class="mobile-link text-white text-2xl font-display hover:text-gold transition-colors">{l.label}</a>
     ))}
