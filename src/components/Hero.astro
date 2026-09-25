@@ -9,7 +9,7 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
 ---
 
 <section id="home" class="hero-scrub relative bg-navy" data-frame-count={FRAME_COUNT}>
-  <div class="hero-scrub__pin sticky top-0 h-svh overflow-hidden flex items-start md:items-end justify-center">
+  <div class="hero-scrub__pin sticky top-0 h-svh overflow-hidden flex items-end justify-center">
     <canvas class="hero-scrub__canvas absolute inset-0 size-full" aria-hidden="true"></canvas>
     <video
       class="hero-scrub__video absolute inset-0 size-full object-cover hidden"
@@ -31,11 +31,11 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
 
     <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/5 to-navy/20"></div>
 
-    <div class="hero-scrub__content relative z-10 text-center px-6 max-w-2xl mx-auto pt-28 md:pt-0 pb-16 lg:pb-24">
+    <div class="hero-scrub__content relative z-10 text-center px-6 max-w-2xl mx-auto pb-16 lg:pb-24">
       <h1 class="sr-only">{site.name} - Barcarello, Palermo</h1>
 
-      <p class="text-white text-lg sm:text-xl max-w-xl mx-auto text-shadow">
-        {site.tagline}.
+      <p class="mt-6 text-white text-lg sm:text-xl max-w-xl mx-auto text-shadow">
+        {site.tagline}. Crudo di mare, pizza e cocktail, davanti al tramonto più bello della costa.
       </p>
 
       <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
