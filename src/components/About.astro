@@ -9,7 +9,19 @@ const facts = [
 ];
 ---
 
-<section id="storia" class="relative py-20 lg:py-28 px-6 bg-navy text-white overflow-hidden">
+<section id="storia" class="relative min-h-svh flex items-center py-20 lg:py-28 px-6 bg-navy text-white overflow-hidden">
+  <video
+    class="absolute inset-0 size-full object-cover"
+    muted
+    playsinline
+    loop
+    autoplay
+    aria-hidden="true"
+  >
+    <source src="/video/sunset-about-bg.mp4" />
+  </video>
+  <div class="absolute inset-0 bg-navy/80"></div>
+
   <div class="relative z-10 max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-12 items-center">
     <div>
       <p class="text-gold uppercase tracking-[0.3em] text-xs font-semibold mb-3">Chi siamo</p>
