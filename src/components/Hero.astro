@@ -1,9 +1,10 @@
 ---
 import { site } from "../data/site";
 
-// Sequenza di fotogrammi per lo scroll-scrub: ripresa unificata (terrazza di Sunset in dissolvenza
-// verso il mare/isola delle Femmine, la stessa vista dai tavolini), 30fps/17.27s, 518 frame.
-const FRAME_COUNT = 518;
+// Sequenza di fotogrammi per lo scroll-scrub: ripresa unificata in tre atti, con due dissolvenze -
+// terrazza di giorno -> mare/isola delle Femmine al tramonto -> terrazza di sera con insegna accesa.
+// 30fps/26.17s, 785 frame.
+const FRAME_COUNT = 785;
 const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0")}.webp`;
 ---
 
