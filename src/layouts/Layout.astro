@@ -36,6 +36,9 @@ const jsonLd = {
     reviewCount: site.rating.count,
   },
   ...(site.phone ? { telephone: site.phone } : {}),
+  legalName: site.legal.companyName,
+  vatID: `IT${site.legal.vatNumber}`,
+  hasMap: site.address.mapsUrl,
 };
 ---
 

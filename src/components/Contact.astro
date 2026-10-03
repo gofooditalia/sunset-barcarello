@@ -2,8 +2,7 @@
 import { MapPin, Phone, Clock, Instagram, Facebook } from "lucide-astro";
 import { site } from "../data/site";
 
-const { lat, lng } = site.address;
-const mapSrc = `https://www.google.com/maps?q=${lat},${lng}&z=17&hl=it&output=embed`;
+const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.address.mapsQuery)}&z=15&hl=it&output=embed`;
 ---
 
 <section id="contatti" class="py-20 lg:py-28 px-6 bg-cream">
@@ -37,6 +36,9 @@ const mapSrc = `https://www.google.com/maps?q=${lat},${lng}&z=17&hl=it&output=em
       </ul>
 
       <div class="flex flex-wrap gap-4 mt-10">
+        <a href={site.address.directionsUrl} target="_blank" rel="noopener" class="rounded-lg h-12 px-6 flex items-center bg-primary text-white font-bold hover:opacity-90 transition-opacity">
+          Indicazioni stradali
+        </a>
         {site.whatsapp && (
           <a href={`https://wa.me/${site.whatsapp}`} target="_blank" rel="noopener" class="rounded-lg h-12 px-6 flex items-center bg-navy text-white font-bold hover:opacity-90 transition-opacity">
             Scrivici su WhatsApp
@@ -51,11 +53,11 @@ const mapSrc = `https://www.google.com/maps?q=${lat},${lng}&z=17&hl=it&output=em
       </div>
     </div>
 
-    <div class="rounded-2xl overflow-hidden bg-white min-h-80 shadow-md">
+    <div class="rounded-2xl overflow-hidden bg-white min-h-96 lg:min-h-[28rem] shadow-md">
       <iframe
         title={`Mappa ${site.name}`}
         src={mapSrc}
-        class="w-full h-full min-h-80 border-0"
+        class="block w-full h-full min-h-96 lg:min-h-[28rem] border-0"
         loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
       ></iframe>
