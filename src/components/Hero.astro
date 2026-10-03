@@ -1,11 +1,9 @@
 ---
 import { site } from "../data/site";
 
-// Sequenza di fotogrammi per lo scroll-scrub: ripresa unificata in tre atti, con due dissolvenze -
-// terrazza di giorno -> mare/isola delle Femmine al tramonto -> terrazza di sera con insegna accesa.
-// Ricavata dal video a 30fps/26.17s tenendo 1 frame ogni 5 (157 frame, ~9 MB invece di 46 MB):
-// la dissolvenza tra frame adiacenti nello script compensa i fotogrammi rimossi.
-const FRAME_COUNT = 157;
+// Sequenza di fotogrammi per lo scroll-scrub: timelapse del sole che tramonta dietro
+// l'Isola delle Femmine, da mezzogiorno al tramonto (sunset_timelapse.mp4, 30fps/4.3s, 130 frame).
+const FRAME_COUNT = 130;
 const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0")}.webp`;
 ---
 
@@ -17,11 +15,12 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
       muted
       playsinline
       preload="none"
-      loop
       aria-hidden="true"
     >
-      <source src="/video/sunset-hero-mobile.mp4" media="(max-width: 767px)" />
-      <source src="/video/sunset-hero.mp4" />
+      <!-- Niente loop: il timelapse va da mezzogiorno al tramonto e si ferma sull'ultimo frame
+           (ricominciare da capo farebbe "saltare" il cielo da arancione ad azzurro). -->
+      <source src="/video/hero-mobile.mp4" media="(max-width: 767px)" type="video/mp4" />
+      <source src="/video/hero-1280.mp4" type="video/mp4" />
     </video>
     <img
       class="hero-scrub__poster absolute inset-0 size-full object-cover"
@@ -229,7 +228,7 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
     }
 
     // Disegna la posizione frazionaria con una dissolvenza tra i due frame adiacenti:
-    // con 157 frame lo scroll resta fluido anche quando si scorre lentamente.
+    // lo scroll resta fluido anche quando si scorre lentamente.
     function draw() {
       const a = Math.floor(position);
       const b = Math.min(frameCount - 1, a + 1);
