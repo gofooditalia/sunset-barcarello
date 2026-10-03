@@ -3,6 +3,12 @@ import { MapPin, Phone, Clock, Instagram, Facebook } from "lucide-astro";
 import { site } from "../data/site";
 
 const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.address.mapsQuery)}&z=15&hl=it&output=embed`;
+
+// Chiave Google Maps (Maps JavaScript API). Con la chiave: mappa personalizzata senza altre
+// attività e segnaposto Sunset. Senza chiave: resta la mappa incorporata classica.
+// È una chiave "pubblica" per definizione (finisce nel browser): va protetta su Google Cloud
+// con restrizione ai domini del sito e alla sola Maps JavaScript API.
+const mapsKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 ---
 
 <section id="contatti" class="py-20 lg:py-28 px-6 bg-cream">
@@ -54,13 +60,111 @@ const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(site.address.
     </div>
 
     <div class="rounded-2xl overflow-hidden bg-white min-h-96 lg:min-h-[28rem] shadow-md">
-      <iframe
-        title={`Mappa ${site.name}`}
-        src={mapSrc}
-        class="block w-full h-full min-h-96 lg:min-h-[28rem] border-0"
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-      ></iframe>
+      {mapsKey ? (
+        <div
+          id="sunset-map"
+          class="w-full h-full min-h-96 lg:min-h-[28rem] bg-cream"
+          role="region"
+          aria-label={`Mappa ${site.name}`}
+          data-key={mapsKey}
+          data-lat={site.address.lat}
+          data-lng={site.address.lng}
+          data-name={site.name}
+          data-street={`${site.address.street}, ${site.address.city}`}
+          data-directions={site.address.directionsUrl}
+        ></div>
+      ) : (
+        <iframe
+          title={`Mappa ${site.name}`}
+          src={mapSrc}
+          class="block w-full h-full min-h-96 lg:min-h-[28rem] border-0"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+      )}
     </div>
   </div>
 </section>
+
+<script>
+  // Mappa Google personalizzata: lo script di Google (~200 KB) si carica solo quando la sezione
+  // sta per entrare nello schermo. Lo stile nasconde attività, negozi e fermate: restano
+  // strade e mare, più il segnaposto Sunset.
+  const el = document.getElementById("sunset-map");
+
+  const MAP_STYLE = [
+    { featureType: "poi", stylers: [{ visibility: "off" }] },
+    { featureType: "transit", stylers: [{ visibility: "off" }] },
+    { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#a9cfe3" }] },
+    { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#f6efe4" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#5b6b78" }] },
+  ];
+
+  // Segnaposto nei colori del sito (arancio tramonto, bordo bianco).
+  const PIN_SVG =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="52" viewBox="0 0 40 52">' +
+    '<path d="M20 1C9.5 1 1 9.4 1 19.8 1 33.9 20 51 20 51s19-17.1 19-31.2C39 9.4 30.5 1 20 1z" fill="#e85d2c" stroke="#fff" stroke-width="2"/>' +
+    '<circle cx="20" cy="19.5" r="7" fill="#fff"/></svg>';
+
+  function initMap(node: HTMLElement) {
+    const g = (window as any).google;
+    const pos = { lat: Number(node.dataset.lat), lng: Number(node.dataset.lng) };
+    const map = new g.maps.Map(node, {
+      center: pos,
+      zoom: 16,
+      styles: MAP_STYLE,
+      disableDefaultUI: true,
+      zoomControl: true,
+      gestureHandling: "cooperative", // su mobile serve due dita: lo scroll della pagina non resta "incastrato"
+      clickableIcons: false,
+    });
+    const marker = new g.maps.Marker({
+      position: pos,
+      map,
+      title: node.dataset.name,
+      icon: {
+        url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(PIN_SVG),
+        scaledSize: new g.maps.Size(40, 52),
+        anchor: new g.maps.Point(20, 51),
+      },
+    });
+    // Il nome va nella riga della X di chiusura, così la scheda non ha spazio vuoto in alto.
+    const header = document.createElement("strong");
+    header.textContent = node.dataset.name ?? "";
+    header.style.cssText = "font-size:15px;color:#0c2436;line-height:1.2;padding-top:2px";
+    const info = new g.maps.InfoWindow({
+      headerContent: header,
+      content:
+        `<div style="font-family:inherit;padding:0 4px 2px;color:#0c2436">` +
+        `<span style="font-size:13px">${node.dataset.street}</span><br>` +
+        `<a href="${node.dataset.directions}" target="_blank" rel="noopener" style="color:#e85d2c;font-weight:600;font-size:13px">Indicazioni stradali →</a></div>`,
+    });
+    marker.addListener("click", () => info.open({ map, anchor: marker }));
+    info.open({ map, anchor: marker });
+  }
+
+  function loadGoogleMaps(node: HTMLElement) {
+    (window as any).__initSunsetMap = () => initMap(node);
+    const s = document.createElement("script");
+    s.src =
+      `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(node.dataset.key!)}` +
+      `&callback=__initSunsetMap&loading=async&language=it&region=IT`;
+    s.async = true;
+    document.head.appendChild(s);
+  }
+
+  if (el) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          loadGoogleMaps(el);
+        }
+      },
+      { rootMargin: "400px 0px" },
+    );
+    io.observe(el);
+  }
+</script>
