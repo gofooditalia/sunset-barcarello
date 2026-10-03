@@ -3,8 +3,9 @@ import { site } from "../data/site";
 
 // Sequenza di fotogrammi per lo scroll-scrub: ripresa unificata in tre atti, con due dissolvenze -
 // terrazza di giorno -> mare/isola delle Femmine al tramonto -> terrazza di sera con insegna accesa.
-// 30fps/26.17s, 785 frame.
-const FRAME_COUNT = 785;
+// Ricavata dal video a 30fps/26.17s tenendo 1 frame ogni 5 (157 frame, ~9 MB invece di 46 MB):
+// la dissolvenza tra frame adiacenti nello script compensa i fotogrammi rimossi.
+const FRAME_COUNT = 157;
 const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0")}.webp`;
 ---
 
@@ -61,9 +62,8 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
 
 <script is:inline>
   // Bloccante (non-module): gira PRIMA del primo paint, quindi decide subito se questa è
-  // una sessione desktop scroll-scrub (contenuto nascosto via CSS di default, vedi sotto)
-  // o una sessione fallback (mobile / riduci animazioni: va rivelato subito, senza attese).
-  // Evita qualsiasi lampeggio di testo/pulsanti, a differenza di uno script module deferred.
+  // una sessione desktop scroll-scrub (sezione alta 300vh, canvas) o una sessione fallback
+  // (mobile / riduci animazioni: video in autoplay). Evita salti di layout al primo paint.
   (function () {
     var section = document.querySelector(".hero-scrub");
     if (!section) return;
@@ -79,21 +79,14 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
 </script>
 
 <style>
-  /* Nascosto di default: si assume la modalità scroll-scrub (il caso desktop più comune).
-     Lo script inline sopra aggiunge is-content-visible PRIMA del primo paint per i casi
-     fallback (mobile / riduci animazioni), quindi qui non c'è mai un lampeggio visibile. */
+  /* Il contenuto (CTA "Prenota") è visibile da subito in ogni modalità: non dipende mai
+     dal caricamento dei frame. In modalità scrub è lo script a sfumarlo durante l'animazione. */
   .hero-scrub {
     height: 100svh;
   }
 
-  .hero-scrub__content {
-    opacity: 0;
-    transform: translateY(24px);
+  .hero-scrub__content.is-hidden {
     pointer-events: none;
-  }
-
-  .hero-scrub__content.is-visible {
-    pointer-events: auto;
   }
 
   .hero-scrub__canvas {
@@ -159,84 +152,146 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
   }
 
   function initHeroScrub(section: HTMLElement, frameCount: number) {
-    const pin = section.querySelector<HTMLElement>(".hero-scrub__pin");
     const canvas = section.querySelector<HTMLCanvasElement>(".hero-scrub__canvas");
     const content = section.querySelector<HTMLElement>(".hero-scrub__content");
-    if (!pin || !canvas || !content) return;
+    if (!canvas || !content) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const images: HTMLImageElement[] = new Array(frameCount);
-    let loadedCount = 0;
-    let currentFrame = 1;
+    const images: (HTMLImageElement | undefined)[] = new Array(frameCount);
+    const loaded: boolean[] = new Array(frameCount).fill(false);
+    let position = 0; // posizione corrente (frazionaria) nella sequenza, 0..frameCount-1
+    let ready = false;
     let ticking = false;
-    const revealStart = 0.7; // inizio fade-in testo/CTA (% di scroll dell'hero)
-    const revealEnd = 0.85; // fade-in completato (contenuto pienamente rivelato)
+
+    // Timeline del contenuto (CTA + rating), in % di scroll dell'hero:
+    // visibile all'apertura, sparisce mentre scorre il "film", ricompare sul finale.
+    const hideStart = 0.03;
+    const hideEnd = 0.12;
+    const revealStart = 0.7;
+    const revealEnd = 0.85;
+
+    // Fase 1 (prioritaria): un frame ogni 8 + l'ultimo. Bastano ~20 immagini (~1 MB)
+    // per rendere lo scrub reattivo; i frame intermedi arrivano dopo, in background.
+    const PRIORITY_STEP = 8;
+    const MAX_PARALLEL = 6;
+    const priority: number[] = [];
+    for (let i = 0; i < frameCount; i += PRIORITY_STEP) priority.push(i);
+    if (priority[priority.length - 1] !== frameCount - 1) priority.push(frameCount - 1);
+    const prioritySet = new Set(priority);
+    const rest: number[] = [];
+    for (let i = 0; i < frameCount; i++) if (!prioritySet.has(i)) rest.push(i);
+    const queue = [...priority, ...rest];
+    let priorityLeft = priority.length;
+    let inFlight = 0;
+
+    function pump() {
+      while (inFlight < MAX_PARALLEL && queue.length) {
+        const i = queue.shift()!;
+        inFlight++;
+        const img = new Image();
+        img.decoding = "async";
+        const done = (ok: boolean) => {
+          inFlight--;
+          loaded[i] = ok;
+          if (ok && i === 0) resizeCanvas();
+          if (prioritySet.has(i) && --priorityLeft === 0) activate();
+          else if (ready && ok) requestRender();
+          pump();
+        };
+        img.onload = () => done(true);
+        img.onerror = () => done(false);
+        img.src = framePath(i + 1);
+        images[i] = img;
+      }
+    }
+
+    // Frame caricato più vicino a i (cerca in entrambe le direzioni).
+    function nearestLoaded(i: number): number {
+      if (loaded[i]) return i;
+      for (let d = 1; d < frameCount; d++) {
+        if (i - d >= 0 && loaded[i - d]) return i - d;
+        if (i + d < frameCount && loaded[i + d]) return i + d;
+      }
+      return -1;
+    }
+
+    function drawImageCover(img: HTMLImageElement, alpha: number) {
+      const cw = canvas!.width;
+      const ch = canvas!.height;
+      const scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+      const w = img.naturalWidth * scale;
+      const h = img.naturalHeight * scale;
+      ctx!.globalAlpha = alpha;
+      ctx!.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+    }
+
+    // Disegna la posizione frazionaria con una dissolvenza tra i due frame adiacenti:
+    // con 157 frame lo scroll resta fluido anche quando si scorre lentamente.
+    function draw() {
+      const a = Math.floor(position);
+      const b = Math.min(frameCount - 1, a + 1);
+      const t = position - a;
+      const ia = nearestLoaded(a);
+      if (ia < 0) return;
+      ctx!.globalAlpha = 1;
+      drawImageCover(images[ia]!, 1);
+      if (t > 0.02 && b !== a && loaded[b] && loaded[a]) {
+        drawImageCover(images[b]!, t);
+      }
+      ctx!.globalAlpha = 1;
+    }
 
     function resizeCanvas() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas!.width = window.innerWidth * dpr;
       canvas!.height = window.innerHeight * dpr;
-      drawFrame(currentFrame);
+      draw();
     }
 
-    function drawFrame(index: number) {
-      const img = images[index - 1];
-      if (!img || !img.complete || img.naturalWidth === 0) return;
-      currentFrame = index;
-      const canvasW = canvas!.width;
-      const canvasH = canvas!.height;
-      const scale = Math.max(canvasW / img.naturalWidth, canvasH / img.naturalHeight);
-      const drawW = img.naturalWidth * scale;
-      const drawH = img.naturalHeight * scale;
-      const dx = (canvasW - drawW) / 2;
-      const dy = (canvasH - drawH) / 2;
-      ctx!.clearRect(0, 0, canvasW, canvasH);
-      ctx!.drawImage(img, dx, dy, drawW, drawH);
+    function progressOf(): number {
+      const scrollable = section.offsetHeight - window.innerHeight;
+      const scrolled = -section.getBoundingClientRect().top;
+      return scrollable > 0 ? Math.min(1, Math.max(0, scrolled / scrollable)) : 0;
     }
 
-    function onScroll() {
+    function contentOpacity(p: number): number {
+      if (p <= hideStart) return 1;
+      if (p < hideEnd) return 1 - (p - hideStart) / (hideEnd - hideStart);
+      if (p < revealStart) return 0;
+      if (p < revealEnd) return (p - revealStart) / (revealEnd - revealStart);
+      return 1;
+    }
+
+    function render() {
+      ticking = false;
+      const p = progressOf();
+      position = p * (frameCount - 1);
+      draw();
+      const o = contentOpacity(p);
+      content!.style.opacity = String(o);
+      content!.style.transform = `translateY(${(1 - o) * 24}px)`;
+      content!.classList.toggle("is-hidden", o < 0.5);
+    }
+
+    function requestRender() {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(() => {
-        const scrollableDistance = section.offsetHeight - window.innerHeight;
-        const scrolled = -section.getBoundingClientRect().top;
-        const progress = scrollableDistance > 0
-          ? Math.min(1, Math.max(0, scrolled / scrollableDistance))
-          : 0;
-
-        const frameIndex = Math.min(frameCount, Math.max(1, Math.round(progress * (frameCount - 1)) + 1));
-        drawFrame(frameIndex);
-
-        const reveal = Math.min(1, Math.max(0, (progress - revealStart) / (revealEnd - revealStart)));
-        content!.style.opacity = String(reveal);
-        content!.style.transform = `translateY(${(1 - reveal) * 24}px)`;
-        content!.classList.toggle("is-visible", reveal > 0.5);
-
-        ticking = false;
-      });
+      requestAnimationFrame(render);
     }
 
-    // Precarica tutti i fotogrammi; attiva lo scrub solo quando sono pronti.
-    for (let i = 1; i <= frameCount; i++) {
-      const img = new Image();
-      img.onload = () => {
-        loadedCount++;
-        if (i === 1) {
-          resizeCanvas();
-        }
-        if (loadedCount === frameCount) {
-          section.classList.add("is-frames-ready");
-          window.addEventListener("scroll", onScroll, { passive: true });
-          window.addEventListener("resize", resizeCanvas, { passive: true });
-          resizeCanvas();
-          onScroll();
-        }
-      };
-      img.src = framePath(i);
-      images[i - 1] = img;
+    function activate() {
+      if (ready) return;
+      ready = true;
+      section.classList.add("is-frames-ready");
+      window.addEventListener("scroll", requestRender, { passive: true });
+      window.addEventListener("resize", resizeCanvas, { passive: true });
+      resizeCanvas();
+      render();
     }
+
+    pump();
   }
 
   function init() {
