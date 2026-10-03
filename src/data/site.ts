@@ -14,7 +14,15 @@ export const site = {
     zip: "90147",
     lat: 38.206468,
     lng: 13.2825593,
-    mapsUrl: "https://www.google.com/maps/search/?api=1&query=38.206468,13.2825593",
+    // Nome della scheda Google del locale: usato per mappa e link, così Google mostra
+    // la scheda vera (nome, stelle, indicazioni) invece di un segnaposto anonimo su coordinate.
+    mapsQuery: "Sunset apericena pizzeria, Via Barcarello 35, Palermo",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Sunset%20apericena%20pizzeria%2C%20Via%20Barcarello%2035%2C%20Palermo",
+    directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=Sunset%20apericena%20pizzeria%2C%20Via%20Barcarello%2035%2C%20Palermo",
+  },
+  legal: {
+    companyName: "Sunset di Troia Matteo",
+    vatNumber: "06904650824",
   },
   phone: "366 332 9565",
   whatsapp: "393663329565", // stesso numero, raggiungibile su WhatsApp: usato anche dal modulo prenotazioni
