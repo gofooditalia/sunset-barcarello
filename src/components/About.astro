@@ -10,22 +10,21 @@ const facts = [
 ---
 
 <section id="storia" class="relative min-h-svh flex items-center py-20 lg:py-28 px-6 bg-navy text-white overflow-hidden">
-  <!-- Video di sfondo: nessun download al caricamento della pagina (preload="none", sorgenti
-       in data-src). Lo script lo carica solo quando la sezione sta per entrare nello schermo,
-       in versione leggera su mobile. Con "riduci animazioni" o risparmio dati resta il poster. -->
-  <video
-    class="about-bg absolute inset-0 size-full object-cover"
-    muted
-    playsinline
-    loop
-    preload="none"
-    poster="/images/about-poster.webp"
+  <!-- Sfondo: foto del tramonto sull'Isola delle Femmine in WebP. Il browser sceglie
+       la larghezza adatta allo schermo e la scarica solo quando la sezione si avvicina. -->
+  <img
+    class="absolute inset-0 size-full object-cover"
+    src="/images/chisiamo-1280.webp"
+    srcset="/images/chisiamo-768.webp 768w, /images/chisiamo-1280.webp 1280w, /images/chisiamo-1920.webp 1920w"
+    sizes="100vw"
+    width="1920"
+    height="1080"
+    alt=""
     aria-hidden="true"
-  >
-    <source data-src="/video/about-854.mp4" media="(max-width: 767px)" type="video/mp4" />
-    <source data-src="/video/about-1280.mp4" type="video/mp4" />
-  </video>
-  <div class="absolute inset-0 bg-navy/80"></div>
+    loading="lazy"
+    decoding="async"
+  />
+  <div class="absolute inset-0 bg-navy/60"></div>
 
   <div class="relative z-10 max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-12 items-center">
     <div>
@@ -56,31 +55,3 @@ const facts = [
     </ul>
   </div>
 </section>
-
-<script>
-  const video = document.querySelector<HTMLVideoElement>(".about-bg");
-  const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (video && !reduceMotion && !conn?.saveData && "IntersectionObserver" in window) {
-    let loaded = false;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          if (!loaded) {
-            video.querySelectorAll<HTMLSourceElement>("source[data-src]").forEach((s) => {
-              s.src = s.dataset.src!;
-            });
-            video.load();
-            loaded = true;
-          }
-          video.play().catch(() => {});
-        } else if (loaded) {
-          video.pause();
-        }
-      },
-      { rootMargin: "300px 0px" },
-    );
-    observer.observe(video);
-  }
-</script>
