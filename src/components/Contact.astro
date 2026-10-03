@@ -130,10 +130,14 @@ const mapsKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
         anchor: new g.maps.Point(20, 51),
       },
     });
+    // Il nome va nella riga della X di chiusura, così la scheda non ha spazio vuoto in alto.
+    const header = document.createElement("strong");
+    header.textContent = node.dataset.name ?? "";
+    header.style.cssText = "font-size:15px;color:#0c2436;line-height:1.2;padding-top:2px";
     const info = new g.maps.InfoWindow({
+      headerContent: header,
       content:
-        `<div style="font-family:inherit;padding:2px 4px;color:#0c2436">` +
-        `<strong style="font-size:15px">${node.dataset.name}</strong><br>` +
+        `<div style="font-family:inherit;padding:0 4px 2px;color:#0c2436">` +
         `<span style="font-size:13px">${node.dataset.street}</span><br>` +
         `<a href="${node.dataset.directions}" target="_blank" rel="noopener" style="color:#e85d2c;font-weight:600;font-size:13px">Indicazioni stradali →</a></div>`,
     });
