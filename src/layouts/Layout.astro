@@ -18,7 +18,7 @@ const jsonLd = {
   name: site.name,
   description: site.description,
   url: "https://sunsetbarcarello.it",
-  image: "https://sunsetbarcarello.it/images/og-image.png",
+  image: "https://sunsetbarcarello.it/images/og-image.jpg",
   servesCuisine: ["Pizza", "Pesce", "Cucina siciliana"],
   address: {
     "@type": "PostalAddress",
@@ -55,7 +55,7 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="it_IT" />
-    <meta property="og:image" content="https://sunsetbarcarello.it/images/og-image.png" />
+    <meta property="og:image" content="https://sunsetbarcarello.it/images/og-image.jpg" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body class="bg-cream text-neutral-text antialiased">

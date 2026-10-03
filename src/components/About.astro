@@ -10,15 +10,20 @@ const facts = [
 ---
 
 <section id="storia" class="relative min-h-svh flex items-center py-20 lg:py-28 px-6 bg-navy text-white overflow-hidden">
+  <!-- Video di sfondo: nessun download al caricamento della pagina (preload="none", sorgenti
+       in data-src). Lo script lo carica solo quando la sezione sta per entrare nello schermo,
+       in versione leggera su mobile. Con "riduci animazioni" o risparmio dati resta il poster. -->
   <video
-    class="absolute inset-0 size-full object-cover"
+    class="about-bg absolute inset-0 size-full object-cover"
     muted
     playsinline
     loop
-    autoplay
+    preload="none"
+    poster="/images/about-poster.webp"
     aria-hidden="true"
   >
-    <source src="/video/sunset-about-bg.mp4" />
+    <source data-src="/video/about-854.mp4" media="(max-width: 767px)" type="video/mp4" />
+    <source data-src="/video/about-1280.mp4" type="video/mp4" />
   </video>
   <div class="absolute inset-0 bg-navy/80"></div>
 
@@ -51,3 +56,31 @@ const facts = [
     </ul>
   </div>
 </section>
+
+<script>
+  const video = document.querySelector<HTMLVideoElement>(".about-bg");
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (video && !reduceMotion && !conn?.saveData && "IntersectionObserver" in window) {
+    let loaded = false;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!loaded) {
+            video.querySelectorAll<HTMLSourceElement>("source[data-src]").forEach((s) => {
+              s.src = s.dataset.src!;
+            });
+            video.load();
+            loaded = true;
+          }
+          video.play().catch(() => {});
+        } else if (loaded) {
+          video.pause();
+        }
+      },
+      { rootMargin: "300px 0px" },
+    );
+    observer.observe(video);
+  }
+</script>

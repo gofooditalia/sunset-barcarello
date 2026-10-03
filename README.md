@@ -16,7 +16,7 @@ Benvenuti su Sunset Barcarello. Sito ufficiale di Sunset Barcarello, pizzeria, r
 - `src/layouts/`: layout principale con SEO e JSON-LD Restaurant.
 - `src/components/`: sezioni della home (Navbar, Hero, About, Menu, Reviews, Gallery, Contact, Footer). La Gallery si attiva con `hasGallery: true`.
 - `src/pages/`: pagine del sito.
-- `public/images/`: og-image.png (social share). Foto reali del locale da aggiungere quando disponibili (about.jpg, gallery/1..6.jpg).
+- `public/images/`: og-image.jpg (social share). Foto reali del locale da aggiungere quando disponibili (about.jpg, gallery/1..6.jpg).
 
 Il link `/menu` reindirizza al menu digitale GO!Food già live: https://www.gofoodmenu.it/sunset-barcarello
 
