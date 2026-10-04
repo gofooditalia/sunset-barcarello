@@ -29,7 +29,7 @@ const links = [
         href={site.menuUrl}
         target="_blank"
         rel="noopener"
-        class="flex items-center justify-center rounded-lg h-11 px-6 bg-primary text-white text-sm font-black tracking-widest uppercase hover:bg-primary-dark transition-all shadow-lg shadow-primary/30 active:scale-95"
+        class="flex items-center justify-center rounded-lg h-11 px-6 bg-primary-dark text-white text-sm font-black tracking-widest uppercase hover:bg-[#9a3716] transition-all shadow-lg shadow-primary/30 active:scale-95"
       >
         Vedi menu
       </a>
@@ -48,7 +48,7 @@ const links = [
     {links.map((l) => (
       <a href={l.href} class="mobile-link text-white text-2xl font-display hover:text-gold transition-colors">{l.label}</a>
     ))}
-    <a href={site.menuUrl} target="_blank" rel="noopener" class="mobile-link mt-4 rounded-lg h-12 px-8 flex items-center bg-primary text-white font-black tracking-widest uppercase">
+    <a href={site.menuUrl} target="_blank" rel="noopener" class="mobile-link mt-4 rounded-lg h-12 px-8 flex items-center bg-primary-dark text-white font-black tracking-widest uppercase">
       Vedi menu
     </a>
   </div>

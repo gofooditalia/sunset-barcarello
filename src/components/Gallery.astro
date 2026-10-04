@@ -1,5 +1,5 @@
 ---
-// Foto in public/images/gallery/: NN.webp = miniatura quadrata 640px, NN-full.webp = foto intera (lato lungo 1600px).
+// Foto in public/images/gallery/: NN.webp = miniatura quadrata 640px (NN-sm.webp = 320px per i telefoni), NN-full.webp = foto intera (lato lungo 1600px).
 // Per sostituirle dopo lo shooting basta rigenerare i file con gli stessi nomi e aggiornare gli alt qui sotto.
 const photos = [
   { alt: "Il sole che tramonta dietro l'Isola delle Femmine, vista da Barcarello" },
@@ -13,7 +13,12 @@ const photos = [
   { alt: "Spaghetti allo scoglio" },
 ].map((p, i) => {
   const n = String(i + 1).padStart(2, "0");
-  return { ...p, thumb: `/images/gallery/${n}.webp`, full: `/images/gallery/${n}-full.webp` };
+  return {
+    ...p,
+    thumb: `/images/gallery/${n}.webp`,
+    thumbSm: `/images/gallery/${n}-sm.webp`, // 320px per i telefoni
+    full: `/images/gallery/${n}-full.webp`,
+  };
 });
 ---
 
@@ -35,6 +40,8 @@ const photos = [
           >
             <img
               src={p.thumb}
+              srcset={`${p.thumbSm} 320w, ${p.thumb} 640w`}
+              sizes="(min-width: 1024px) 384px, 50vw"
               alt={p.alt}
               width="640"
               height="640"
