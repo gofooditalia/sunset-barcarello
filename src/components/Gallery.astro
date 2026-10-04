@@ -1,23 +1,191 @@
 ---
-// TODO: sostituire con le foto reali in public/images/gallery/
-const photos = Array.from({ length: 6 }, (_, i) => ({
-  src: `/images/gallery/${i + 1}.jpg`,
-  alt: `Sunset Barcarello - foto ${i + 1}`,
-}));
+// Foto in public/images/gallery/: NN.webp = miniatura quadrata 640px, NN-full.webp = foto intera (lato lungo 1600px).
+// Per sostituirle dopo lo shooting basta rigenerare i file con gli stessi nomi e aggiornare gli alt qui sotto.
+const photos = [
+  { alt: "Il sole che tramonta dietro l'Isola delle Femmine, vista da Barcarello" },
+  { alt: "Spaghetti all'astice" },
+  { alt: "Spaghetti con gamberi rossi" },
+  { alt: "Spritz e cocktail al bancone, con la terrazza sul mare" },
+  { alt: "Antipasto di crudo di mare" },
+  { alt: "Frittura di paranza con calamari e gamberi" },
+  { alt: "Pizza con crudo, rucola e pomodorini" },
+  { alt: "Zuppa di cozze con crostini" },
+  { alt: "Spaghetti allo scoglio" },
+].map((p, i) => {
+  const n = String(i + 1).padStart(2, "0");
+  return { ...p, thumb: `/images/gallery/${n}.webp`, full: `/images/gallery/${n}-full.webp` };
+});
 ---
 
-<section id="gallery" class="py-20 lg:py-28 px-6 bg-white">
+<section id="gallery" class="py-20 lg:py-28 px-6 bg-navy text-white">
   <div class="max-w-[1200px] mx-auto">
     <div class="text-center max-w-2xl mx-auto">
-      <p class="text-primary uppercase tracking-[0.3em] text-xs font-semibold mb-3">Gallery</p>
-      <h2 class="text-4xl lg:text-5xl font-bold text-navy">Uno sguardo da noi</h2>
+      <p class="text-gold uppercase tracking-[0.3em] text-xs font-semibold mb-3">Gallery</p>
+      <h2 class="text-4xl lg:text-5xl font-bold">Uno sguardo da noi</h2>
     </div>
-    <div class="mt-14 grid grid-cols-2 lg:grid-cols-3 gap-4">
-      {photos.map((p) => (
-        <div class="aspect-square rounded-xl overflow-hidden bg-cream">
-          <img src={p.src} alt={p.alt} class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
-        </div>
+
+    <ul class="mt-14 grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
+      {photos.map((p, i) => (
+        <li>
+          <button
+            type="button"
+            class="gallery-thumb group block w-full aspect-square rounded-xl overflow-hidden bg-white/5 cursor-zoom-in focus-visible:outline-2 focus-visible:outline-gold focus-visible:outline-offset-2"
+            data-index={i}
+            aria-label={`Apri foto: ${p.alt}`}
+          >
+            <img
+              src={p.thumb}
+              alt={p.alt}
+              width="640"
+              height="640"
+              loading="lazy"
+              decoding="async"
+              class="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          </button>
+        </li>
       ))}
-    </div>
+    </ul>
   </div>
+
+  <!-- Lightbox: <dialog> nativo, niente librerie. Esc chiude, frecce per scorrere. -->
+  <dialog class="gallery-lightbox" aria-label="Galleria foto">
+    <img class="gallery-lightbox__img" src="" alt="" />
+    <p class="gallery-lightbox__caption"></p>
+    <button type="button" class="gallery-lightbox__btn gallery-lightbox__close" aria-label="Chiudi">✕</button>
+    <button type="button" class="gallery-lightbox__btn gallery-lightbox__prev" aria-label="Foto precedente">‹</button>
+    <button type="button" class="gallery-lightbox__btn gallery-lightbox__next" aria-label="Foto successiva">›</button>
+  </dialog>
+
+  <script type="application/json" id="gallery-data" set:html={JSON.stringify(photos.map(({ full, alt }) => ({ full, alt })))}></script>
 </section>
+
+<style>
+  .gallery-lightbox {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: white;
+  }
+
+  .gallery-lightbox[open] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gallery-lightbox::backdrop {
+    background: rgb(5 15 30 / 0.92);
+  }
+
+  .gallery-lightbox__img {
+    max-width: min(92vw, 1600px);
+    max-height: 82vh;
+    object-fit: contain;
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 60px rgb(0 0 0 / 0.5);
+  }
+
+  .gallery-lightbox__caption {
+    margin-top: 1rem;
+    padding: 0 4rem;
+    font-size: 0.95rem;
+    text-align: center;
+    color: rgb(255 255 255 / 0.75);
+  }
+
+  .gallery-lightbox__btn {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    background: rgb(255 255 255 / 0.1);
+    color: white;
+    font-size: 1.75rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .gallery-lightbox__btn:hover,
+  .gallery-lightbox__btn:focus-visible {
+    background: rgb(255 255 255 / 0.22);
+  }
+
+  .gallery-lightbox__close {
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.25rem;
+  }
+
+  .gallery-lightbox__prev {
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .gallery-lightbox__next {
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>(".gallery-lightbox");
+  const dataEl = document.getElementById("gallery-data");
+
+  if (dialog && dataEl) {
+    const photos: { full: string; alt: string }[] = JSON.parse(dataEl.textContent || "[]");
+    const img = dialog.querySelector<HTMLImageElement>(".gallery-lightbox__img")!;
+    const caption = dialog.querySelector<HTMLElement>(".gallery-lightbox__caption")!;
+    let current = 0;
+
+    const show = (i: number) => {
+      current = (i + photos.length) % photos.length;
+      img.src = photos[current].full;
+      img.alt = photos[current].alt;
+      caption.textContent = `${photos[current].alt} · ${current + 1}/${photos.length}`;
+      // Precarica la successiva, così lo scorrimento è immediato.
+      new Image().src = photos[(current + 1) % photos.length].full;
+    };
+
+    document.querySelectorAll<HTMLButtonElement>(".gallery-thumb").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        show(Number(btn.dataset.index));
+        dialog.showModal();
+      });
+    });
+
+    dialog.querySelector(".gallery-lightbox__close")!.addEventListener("click", () => dialog.close());
+    dialog.querySelector(".gallery-lightbox__prev")!.addEventListener("click", () => show(current - 1));
+    dialog.querySelector(".gallery-lightbox__next")!.addEventListener("click", () => show(current + 1));
+
+    dialog.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") show(current - 1);
+      if (e.key === "ArrowRight") show(current + 1);
+    });
+
+    // Clic fuori dalla foto (sullo sfondo) chiude.
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+
+    // Swipe su touch.
+    let touchX = 0;
+    dialog.addEventListener("touchstart", (e) => (touchX = e.touches[0].clientX), { passive: true });
+    dialog.addEventListener("touchend", (e) => {
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 50) show(current + (dx < 0 ? 1 : -1));
+    });
+  }
+</script>

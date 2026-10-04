@@ -37,7 +37,7 @@ export const site = {
     facebook: "",  // TODO: link pagina Facebook
   },
   menuUrl: "https://www.gofoodmenu.it/sunset-barcarello",
-  hasGallery: false,    // TODO: true quando le foto sono in public/images/gallery/1..6.jpg
+  hasGallery: true,     // foto in public/images/gallery/ (provvisorie, da sostituire dopo lo shooting)
   rating: {
     value: 4.3,
     count: 315,
