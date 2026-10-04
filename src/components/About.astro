@@ -10,21 +10,22 @@ const facts = [
 ---
 
 <section id="storia" class="relative min-h-svh flex items-center py-20 lg:py-28 px-6 bg-navy text-white overflow-hidden">
-  <!-- Sfondo: foto del tramonto sull'Isola delle Femmine in WebP. Il browser sceglie
+  <!-- Sfondo: il locale illuminato di sera (chi_siamo_sunset.jpg) in WebP. Il browser sceglie
        la larghezza adatta allo schermo e la scarica solo quando la sezione si avvicina. -->
   <img
     class="absolute inset-0 size-full object-cover"
-    src="/images/chisiamo-1280.webp"
-    srcset="/images/chisiamo-768.webp 768w, /images/chisiamo-1280.webp 1280w, /images/chisiamo-1920.webp 1920w"
+    src="/images/chisiamo-sunset-1280.webp"
+    srcset="/images/chisiamo-sunset-768.webp 768w, /images/chisiamo-sunset-1280.webp 1280w, /images/chisiamo-sunset-1920.webp 1920w"
     sizes="100vw"
     width="1920"
-    height="1080"
+    height="1072"
     alt=""
     aria-hidden="true"
     loading="lazy"
     decoding="async"
   />
-  <div class="absolute inset-0 bg-navy/60"></div>
+  <!-- Velo più scuro a sinistra (dove sta il testo), più leggero a destra per lasciar vedere il locale. -->
+  <div class="absolute inset-0 bg-gradient-to-r from-navy/85 via-navy/60 to-navy/40"></div>
 
   <div class="relative z-10 max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-12 items-center">
     <div>
