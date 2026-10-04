@@ -3,11 +3,20 @@ import { site } from "../data/site";
 
 // Sequenza di fotogrammi per lo scroll-scrub: timelapse del sole che tramonta dietro
 // l'Isola delle Femmine, da mezzogiorno al tramonto (sunset_timelapse.mp4, 30fps/4.3s, 130 frame).
+// Su mobile una sequenza dedicata: verticale 540×960, un fotogramma ogni due (65 frame, ~1,1 MB),
+// ricavata da hero-mobile.mp4. Lo scrub resta fluido grazie alla dissolvenza tra frame adiacenti.
 const FRAME_COUNT = 130;
+const FRAME_COUNT_MOBILE = 65;
 const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0")}.webp`;
+const framePathMobile = (n: number) => `/frames/hero-mobile/frame-${String(n).padStart(4, "0")}.webp`;
 ---
 
-<section id="home" class="hero-scrub relative bg-navy" data-frame-count={FRAME_COUNT}>
+<section
+  id="home"
+  class="hero-scrub relative bg-navy"
+  data-frame-count={FRAME_COUNT}
+  data-frame-count-mobile={FRAME_COUNT_MOBILE}
+>
   <div class="hero-scrub__pin sticky top-0 h-svh overflow-hidden flex items-end justify-center">
     <canvas class="hero-scrub__canvas absolute inset-0 size-full" aria-hidden="true"></canvas>
     <video
@@ -22,13 +31,16 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
       <source src="/video/hero-mobile.mp4" media="(max-width: 767px)" type="video/mp4" />
       <source src="/video/hero-1280.mp4" type="video/mp4" />
     </video>
-    <img
-      class="hero-scrub__poster absolute inset-0 size-full object-cover"
-      src={framePath(1)}
-      alt=""
-      aria-hidden="true"
-      fetchpriority="high"
-    />
+    <picture>
+      <source media="(max-width: 767px)" srcset={framePathMobile(1)} />
+      <img
+        class="hero-scrub__poster absolute inset-0 size-full object-cover"
+        src={framePath(1)}
+        alt=""
+        aria-hidden="true"
+        fetchpriority="high"
+      />
+    </picture>
 
     <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/5 to-navy/20"></div>
 
@@ -73,15 +85,18 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
 
 <script is:inline>
   // Bloccante (non-module): gira PRIMA del primo paint, quindi decide subito se questa è
-  // una sessione desktop scroll-scrub (sezione alta 300vh, canvas) o una sessione fallback
-  // (mobile / riduci animazioni: video in autoplay). Evita salti di layout al primo paint.
+  // una sessione scroll-scrub (sezione alta 300vh, canvas; desktop e mobile) o una sessione
+  // fallback ("riduci animazioni": video in autoplay). Evita salti di layout al primo paint.
   (function () {
     var section = document.querySelector(".hero-scrub");
     if (!section) return;
     var frameCount = Number(section.dataset.frameCount || 0);
     var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var isMobile = window.innerWidth < 768;
-    if (prefersReducedMotion || isMobile || !frameCount) {
+    if (window.innerWidth < 768) {
+      section.classList.add("is-mobile");
+      frameCount = Number(section.dataset.frameCountMobile || 0);
+    }
+    if (prefersReducedMotion || !frameCount) {
       section.classList.add("is-content-visible");
     } else {
       section.classList.add("is-scrub-active");
@@ -155,8 +170,9 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
 </style>
 
 <script>
-  function framePath(n: number) {
-    return `/frames/hero/frame-${String(n).padStart(4, "0")}.webp`;
+  function framePath(n: number, mobile: boolean) {
+    const dir = mobile ? "hero-mobile" : "hero";
+    return `/frames/${dir}/frame-${String(n).padStart(4, "0")}.webp`;
   }
 
   function initHeroVideoFallback(section: HTMLElement) {
@@ -173,6 +189,8 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    const mobile = section.classList.contains("is-mobile");
 
     const images: (HTMLImageElement | undefined)[] = new Array(frameCount);
     const loaded: boolean[] = new Array(frameCount).fill(false);
@@ -217,7 +235,7 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
         };
         img.onload = () => done(true);
         img.onerror = () => done(false);
-        img.src = framePath(i + 1);
+        img.src = framePath(i + 1, mobile);
         images[i] = img;
       }
     }
@@ -258,10 +276,15 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
       ctx!.globalAlpha = 1;
     }
 
+    // Dimensioni prese dal canvas stesso (il contenitore è alto 100svh, stabile): su mobile la
+    // barra dell'indirizzo che appare/scompare non provoca ridimensionamenti continui.
     function resizeCanvas() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas!.width = window.innerWidth * dpr;
-      canvas!.height = window.innerHeight * dpr;
+      const w = Math.round(canvas!.clientWidth * dpr) || Math.round(window.innerWidth * dpr);
+      const h = Math.round(canvas!.clientHeight * dpr) || Math.round(window.innerHeight * dpr);
+      if (canvas!.width === w && canvas!.height === h) return draw();
+      canvas!.width = w;
+      canvas!.height = h;
       draw();
     }
 
@@ -320,7 +343,8 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
       return;
     }
 
-    const frameCount = Number(section.dataset.frameCount || 0);
+    const mobile = section.classList.contains("is-mobile");
+    const frameCount = Number((mobile ? section.dataset.frameCountMobile : section.dataset.frameCount) || 0);
     initHeroScrub(section, frameCount);
   }
 
