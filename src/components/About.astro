@@ -43,21 +43,21 @@ const facts = [
        più leggero al centro per lasciar vedere il sole e il riflesso sul mare. -->
   <div class="about__veil absolute inset-0"></div>
 
-  <div class="relative z-10 max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-12 items-center">
-    <div>
+  <div class="about__inner relative z-10 max-w-[1200px] mx-auto grid lg:grid-cols-2 gap-12 items-center">
+    <div class="about__text">
       <p class="reveal reveal--up text-gold uppercase tracking-[0.3em] text-xs font-semibold mb-3" style="--d: 0ms">Chi siamo</p>
-      <h2 class="reveal reveal--up text-4xl lg:text-5xl font-bold leading-tight" style="--d: 120ms">Il mare, la pizza, il tramonto</h2>
-      <span class="reveal reveal--line block h-0.5 w-16 bg-gold mt-6" style="--d: 300ms" aria-hidden="true"></span>
-      <p class="reveal reveal--up mt-6 text-lg text-white/75 leading-relaxed" style="--d: 380ms">
+      <h2 class="about__title reveal reveal--up text-4xl lg:text-5xl font-bold leading-tight" style="--d: 120ms">Il mare, la pizza, il tramonto</h2>
+      <span class="about__line reveal reveal--line block h-0.5 w-16 bg-gold mt-6" style="--d: 300ms" aria-hidden="true"></span>
+      <p class="about__lead reveal reveal--up mt-6 text-lg text-white/75 leading-relaxed" style="--d: 380ms">
         <!-- TODO: storia reale del locale, raccontata dal cliente -->
         {site.shortName} Barcarello è pizzeria, ristorante e apericena affacciata sul mare di Palermo, nel tratto di costa di Barcarello. Cucina di mare, crudi freschissimi e pizza, da gustare mentre il sole tramonta sull'acqua.
       </p>
-      <p class="reveal reveal--up mt-4 text-lg text-white/75 leading-relaxed" style="--d: 500ms">
+      <p class="about__more reveal reveal--up mt-4 text-lg text-white/75 leading-relaxed" style="--d: 500ms">
         Perfetto per un aperitivo tra amici, una cena in coppia o una tavolata da condividere, con vista che cambia colore a ogni ora.
       </p>
     </div>
 
-    <ul class="grid gap-4">
+    <ul class="about__cards grid gap-4">
       {facts.map((f, i) => (
         <li
           class="reveal reveal--card about-card flex items-start gap-5 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
@@ -66,9 +66,9 @@ const facts = [
           <span class="about-card__icon size-12 shrink-0 rounded-xl bg-primary/20 text-gold flex items-center justify-center">
             <f.icon class="size-6" />
           </span>
-          <div>
-            <h3 class="text-xl font-bold">{f.title}</h3>
-            <p class="text-white/70 mt-1">{f.text}</p>
+          <div class="about-card__body">
+            <h3 class="about-card__title text-xl font-bold">{f.title}</h3>
+            <p class="about-card__desc text-white/70 mt-1">{f.text}</p>
           </div>
         </li>
       ))}
@@ -178,14 +178,80 @@ const facts = [
       display: block;
     }
 
+    /* Contenuto tutto nella metà alta, sole e mare liberi nella metà bassa. */
     .about__veil {
       background: linear-gradient(
         to bottom,
-        color-mix(in srgb, var(--color-navy) 80%, transparent) 0%,
-        color-mix(in srgb, var(--color-navy) 55%, transparent) 45%,
-        color-mix(in srgb, var(--color-navy) 70%, transparent) 75%,
-        color-mix(in srgb, var(--color-navy) 90%, transparent) 100%
+        color-mix(in srgb, var(--color-navy) 85%, transparent) 0%,
+        color-mix(in srgb, var(--color-navy) 65%, transparent) 45%,
+        color-mix(in srgb, var(--color-navy) 15%, transparent) 62%,
+        color-mix(in srgb, var(--color-navy) 30%, transparent) 100%
       );
+    }
+
+    /* La sezione occupa esattamente uno schermo: niente scroll dentro "Chi siamo". */
+    .about {
+      height: 100svh;
+      min-height: 0;
+      align-items: flex-start;
+      padding-top: calc(4.5rem + 2svh); /* spazio per la navbar fissa */
+      padding-bottom: 0;
+    }
+
+    .about__inner {
+      gap: clamp(1rem, 3svh, 1.75rem);
+      width: 100%;
+    }
+
+    .about__title {
+      font-size: clamp(1.75rem, 4.2svh, 2.25rem);
+    }
+
+    .about__line {
+      margin-top: clamp(0.75rem, 2svh, 1.25rem);
+    }
+
+    .about__lead {
+      margin-top: clamp(0.75rem, 2svh, 1.25rem);
+      font-size: clamp(0.9rem, 2.1svh, 1.05rem);
+      line-height: 1.55;
+    }
+
+    /* Il secondo paragrafo e le descrizioni delle card restano su desktop: in verticale
+       lasciamo il messaggio essenziale per non coprire il video. */
+    .about__more,
+    .about-card__desc {
+      display: none;
+    }
+
+    /* Card compatte: tre tessere affiancate con icona e titolo. */
+    .about__cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    .about-card {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.5rem;
+      padding: clamp(0.6rem, 1.6svh, 0.9rem) 0.4rem;
+      border-radius: 1rem;
+    }
+
+    .about-card__icon {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+
+    .about-card__title {
+      font-size: 0.8rem;
+      line-height: 1.2;
+    }
+
+    /* In riga le card salgono dal basso invece di entrare da destra. */
+    .about.is-armed .reveal--card {
+      transform: translateY(24px) scale(0.96);
     }
   }
 
