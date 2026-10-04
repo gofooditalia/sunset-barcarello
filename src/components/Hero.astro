@@ -35,6 +35,17 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
     <div class="hero-scrub__content relative z-10 text-center px-6 max-w-2xl mx-auto pb-16 lg:pb-24">
       <h1 class="sr-only">{site.name} - Barcarello, Palermo</h1>
 
+      <!-- Logo grande sopra la CTA: il nome del locale deve vedersi subito, non solo nella navbar. -->
+      <img
+        src="/images/logo-bianco.webp"
+        alt=""
+        aria-hidden="true"
+        width="1000"
+        height="419"
+        class="hero-logo mx-auto mb-8 h-24 sm:h-28 lg:h-36 w-auto"
+        fetchpriority="high"
+      />
+
       <div class="flex flex-wrap items-center justify-center gap-4">
         <a
           href="#prenota"
@@ -119,6 +130,10 @@ const framePath = (n: number) => `/frames/hero/frame-${String(n).padStart(4, "0"
 
   .hero-scrub.is-video-active .hero-scrub__poster {
     display: none;
+  }
+
+  .hero-logo {
+    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.5));
   }
 
   .text-shadow {
