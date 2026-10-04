@@ -82,8 +82,8 @@ const facts = [
   .about.is-armed .reveal {
     opacity: 0;
     transition:
-      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms),
-      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0ms);
+      opacity var(--dur, 0.8s) cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 0ms) * var(--k, 1)),
+      transform calc(var(--dur, 0.8s) + 0.1s) cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 0ms) * var(--k, 1));
     will-change: opacity, transform;
   }
 
@@ -107,8 +107,17 @@ const facts = [
     transform: scale(0.4) rotate(-20deg);
     opacity: 0;
     transition:
-      transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--d, 0ms) + 350ms),
-      opacity 0.4s ease calc(var(--d, 0ms) + 350ms);
+      transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--d, 0ms) * var(--k, 1) + 350ms),
+      opacity 0.4s ease calc(var(--d, 0ms) * var(--k, 1) + 350ms);
+  }
+
+  /* Schermi verticali: il video è il protagonista. Gli elementi arrivano con più calma
+     (cascata più distanziata e movimenti più lenti); la pausa iniziale la gestisce lo script. */
+  @media (orientation: portrait) and (max-width: 1023px) {
+    .about {
+      --k: 5;      /* cascata ~5 volte più distesa: ~3 s dal primo all'ultimo elemento */
+      --dur: 1.3s;
+    }
   }
 
   .about.is-armed.is-visible .reveal {
@@ -227,19 +236,46 @@ const facts = [
   if (section && !reduceMotion && "IntersectionObserver" in window) {
     section.classList.add("is-armed");
 
-    // Rivela il contenuto quando la sezione entra per circa un quarto nello schermo (una sola volta).
+    // Su desktop il contenuto compare appena la sezione entra per un quarto.
+    // In verticale lasciamo prima "respirare" il video: la sezione deve arrivare nella parte alta
+    // dello schermo e restarci HOLD_MS prima che il testo entri. Se però il visitatore continua a
+    // scorrere dentro la sezione, il contenuto compare subito: non deve mai trovare la sezione vuota.
+    const isPortrait = portrait.matches;
+    const HOLD_MS = isPortrait ? 2500 : 0;
+    let revealed = false;
+    let holdTimer = 0;
+
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      clearTimeout(holdTimer);
+      section.classList.add("is-visible");
+      revealObserver.disconnect();
+      window.removeEventListener("scroll", onScrollPast);
+      // A cascata conclusa togliamo i ritardi per l'hover (in verticale la cascata è più lunga).
+      setTimeout(() => section.classList.add("is-settled"), isPortrait ? 5000 : 1700);
+    };
+
+    const onScrollPast = () => {
+      // La sezione è già salita di un quarto di schermo: il visitatore sta leggendo, mostriamo tutto.
+      if (section.getBoundingClientRect().top < -window.innerHeight * 0.25) reveal();
+    };
+
     const revealObserver = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          section.classList.add("is-visible");
-          revealObserver.disconnect();
-          // A cascata conclusa (ultima card + icona ≈ 1.6s) togliamo i ritardi per l'hover.
-          setTimeout(() => section.classList.add("is-settled"), 1700);
+        if (!entries.some((e) => e.isIntersecting)) {
+          // Uscita prima della fine della pausa: si ricomincia al prossimo ingresso.
+          clearTimeout(holdTimer);
+          holdTimer = 0;
+          return;
         }
+        if (!HOLD_MS) return reveal();
+        if (!holdTimer) holdTimer = window.setTimeout(reveal, HOLD_MS);
       },
-      { threshold: 0.25 }
+      isPortrait ? { rootMargin: "0px 0px -60% 0px" } : { threshold: 0.25 }
     );
     revealObserver.observe(section);
+    if (isPortrait) window.addEventListener("scroll", onScrollPast, { passive: true });
 
     // Parallax leggero dello sfondo, calcolato solo mentre la sezione è a schermo.
     const bg = section.querySelector<HTMLElement>(".about__bg");
