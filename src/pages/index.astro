@@ -17,10 +17,10 @@ import { site } from "../data/site";
   <main>
     <Hero />
     <About />
+    {site.hasGallery && <Gallery />}
     <Menu />
     <Reviews />
     <Reservation />
-    {site.hasGallery && <Gallery />}
     <Contact />
   </main>
   <Footer />

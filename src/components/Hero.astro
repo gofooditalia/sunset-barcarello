@@ -44,7 +44,9 @@ const framePathMobile = (n: number) => `/frames/hero-mobile/frame-${String(n).pa
 
     <div class="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/5 to-navy/20"></div>
 
-    <div class="hero-scrub__content relative z-10 text-center px-6 max-w-2xl mx-auto pb-16 lg:pb-24">
+    <!-- Logo e CTA nella parte alta, sul cielo: il blocco finisce poco sopra l'isolotto (che sta
+         intorno al 66-70% dell'altezza), così sul finale il sole tramonta proprio sotto il logo. -->
+    <div class="hero-scrub__content relative z-10 text-center px-6 max-w-2xl mx-auto pb-[38svh]">
       <h1 class="sr-only">{site.name} - Barcarello, Palermo</h1>
 
       <!-- Logo grande sopra la CTA: il nome del locale deve vedersi subito, non solo nella navbar. -->
