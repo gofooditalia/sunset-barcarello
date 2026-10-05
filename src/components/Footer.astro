@@ -1,4 +1,5 @@
 ---
+import { Instagram, Facebook } from "lucide-astro";
 import { site } from "../data/site";
 const year = new Date().getFullYear();
 ---
@@ -8,6 +9,18 @@ const year = new Date().getFullYear();
     <div class="text-center sm:text-left">
       <p class="text-white font-display text-lg">{site.name}</p>
       <p>{site.address.street}, {site.address.zip} {site.address.city}</p>
+      <div class="mt-2 flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-1">
+        {site.social.instagram && (
+          <a href={site.social.instagram} target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-white transition-colors">
+            <Instagram class="size-4" /><span>@sunsetapericenapizzeria_</span>
+          </a>
+        )}
+        {site.social.facebook && (
+          <a href={site.social.facebook} target="_blank" rel="noopener" class="inline-flex items-center gap-2 hover:text-white transition-colors">
+            <Facebook class="size-4" /><span>Facebook</span>
+          </a>
+        )}
+      </div>
       <p class="mt-1">© {year} {site.legal.companyName} · P.IVA {site.legal.vatNumber}</p>
     </div>
     <a href="https://gofoodmenu.it" target="_blank" rel="noopener" class="flex items-center gap-2 hover:text-white transition-colors">

@@ -37,8 +37,8 @@ export const site = {
     { days: "Martedì", time: "Chiuso" },
   ],
   social: {
-    instagram: "", // TODO: link pagina Instagram
-    facebook: "",  // TODO: link pagina Facebook
+    instagram: "https://www.instagram.com/sunsetapericenapizzeria_/",
+    facebook: "https://www.facebook.com/share/14iR9v2dhEE/", // link di condivisione: sostituire con l'URL della pagina se disponibile
   },
   menuUrl: "https://www.gofoodmenu.it/sunset-barcarello",
   hasGallery: true,     // foto in public/images/gallery/ (provvisorie, da sostituire dopo lo shooting)

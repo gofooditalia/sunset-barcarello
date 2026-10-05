@@ -46,6 +46,7 @@ const jsonLd = {
   legalName: site.legal.companyName,
   vatID: `IT${site.legal.vatNumber}`,
   hasMap: site.address.mapsUrl,
+  sameAs: [site.social.instagram, site.social.facebook].filter(Boolean),
 };
 ---
 
