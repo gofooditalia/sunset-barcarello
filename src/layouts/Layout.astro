@@ -50,7 +50,10 @@ const jsonLd = {
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#0c2436" />
+    <meta name="apple-mobile-web-app-title" content="Sunset" />
+    <link rel="canonical" href="https://sunsetbarcarello.it/" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -58,7 +61,18 @@ const jsonLd = {
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="it_IT" />
+    <meta property="og:url" content="https://sunsetbarcarello.it/" />
+    <meta property="og:site_name" content="Sunset Barcarello" />
     <meta property="og:image" content="https://sunsetbarcarello.it/images/og-image.jpg" />
+    <meta property="og:image:secure_url" content="https://sunsetbarcarello.it/images/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Tramonto sull'Isola delle Femmine visto da Barcarello" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content="https://sunsetbarcarello.it/images/og-image.jpg" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
   <body class="bg-cream text-neutral-text antialiased">
