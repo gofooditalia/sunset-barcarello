@@ -7,7 +7,7 @@ export const site = {
   shortName: "Sunset",
   tagline: "Pizzeria, ristorante e apericena sul mare",
   description:
-    "Sunset Barcarello - Pizzeria, ristorante e apericena sul mare a Barcarello, Palermo. Crudi di mare, tartare, pizza e cocktail davanti al tramonto più bello della costa.",
+    "Sunset Barcarello - Pizzeria, ristorante e apericena sul mare a Barcarello, Palermo. Aperti tutto l'anno a cena: specialità di pesce, pizza e cocktail davanti al tramonto più bello della costa.",
   address: {
     street: "Via Barcarello, 35",
     city: "Palermo",
@@ -27,11 +27,15 @@ export const site = {
   phone: "366 332 9565",
   whatsapp: "393663329565", // stesso numero, raggiungibile su WhatsApp: usato anche dal modulo prenotazioni
   email: "",            // TODO
-  // Confermato su Google: "Apre alle ore 17:30". Fasce orarie e giorno di chiusura da confermare.
-  openingNotice: "Aperti la sera, dalle 17:30",
+  // Confermato dal titolare (5/10/2026): aperto tutto l'anno, solo a cena, chiuso il martedì.
+  // Apertura alle 17:30 come da scheda Google.
+  openingNotice: "Aperti tutto l'anno, a cena",
+  // Giorni settimanali di chiusura (0 = domenica ... 2 = martedì): usati dal modulo prenotazioni.
+  closedWeekdays: [2],
   hours: [
-    { days: "Tutti i giorni", time: "Dalle 17:30" },
-  ], // TODO: fasce orarie precise ed eventuale giorno di chiusura
+    { days: "Mercoledì – Lunedì", time: "Dalle 17:30" },
+    { days: "Martedì", time: "Chiuso" },
+  ],
   social: {
     instagram: "", // TODO: link pagina Instagram
     facebook: "",  // TODO: link pagina Facebook
