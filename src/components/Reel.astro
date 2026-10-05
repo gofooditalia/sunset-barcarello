@@ -1,0 +1,71 @@
+---
+import { Play, Instagram } from "lucide-astro";
+import { site } from "../data/site";
+
+// Reel Instagram "Aperti tutto l'anno" (settembre 2026), ricompresso per il web: 720x1280, ~7 MB.
+// Il video non si scarica finché il visitatore non preme play (preload="none"): la pagina resta leggera.
+---
+
+<section id="reel" class="py-20 lg:py-28 px-6 bg-cream">
+  <div class="max-w-[1100px] mx-auto grid lg:grid-cols-[minmax(0,420px)_1fr] gap-12 lg:gap-20 items-center">
+    <div class="reel-player relative mx-auto w-full max-w-[360px] lg:max-w-[420px] aspect-[9/16] rounded-3xl overflow-hidden shadow-2xl shadow-navy/25 bg-navy">
+      <video
+        class="reel-video absolute inset-0 size-full object-cover"
+        src="/video/reel-tutto-anno.mp4"
+        poster="/video/reel-tutto-anno-poster.webp"
+        preload="none"
+        playsinline
+        aria-label="Video: Sunset Barcarello resta aperto tutto l'anno"
+      ></video>
+      <button
+        type="button"
+        class="reel-play absolute inset-0 flex items-center justify-center bg-navy/25 hover:bg-navy/10 transition-colors group"
+        aria-label="Guarda il video con l'audio"
+      >
+        <span class="size-20 rounded-full bg-white/90 text-primary-dark flex items-center justify-center shadow-xl group-hover:scale-105 transition-transform">
+          <Play class="size-9 ml-1" fill="currentColor" />
+        </span>
+      </button>
+    </div>
+
+    <div class="order-first lg:order-none text-center lg:text-left">
+      <p class="text-primary-dark uppercase tracking-[0.3em] text-xs font-semibold mb-3">Novità</p>
+      <h2 class="text-4xl lg:text-5xl font-bold text-navy leading-tight">L'estate finisce,<br />il Sunset no</h2>
+      <span class="block h-0.5 w-16 bg-primary mt-6 mx-auto lg:mx-0" aria-hidden="true"></span>
+      <p class="mt-6 text-lg text-neutral-text/80 leading-relaxed">
+        Quest'anno restiamo <strong class="text-navy">aperti tutto l'anno</strong>: ogni sera a cena dalle 17:30, con pizza cotta a legna, specialità di pesce e aperitivi davanti al tramonto. Unico giorno di riposo, il martedì.
+      </p>
+      <p class="mt-4 text-lg text-neutral-text/80 leading-relaxed">Guarda il video: ve lo raccontiamo noi.</p>
+      <div class="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
+        <a href="#prenota" class="rounded-lg h-12 px-6 flex items-center bg-primary-dark text-white font-bold hover:opacity-90 transition-opacity">
+          Prenota un tavolo
+        </a>
+        {site.social.instagram && (
+          <a href={site.social.instagram} target="_blank" rel="noopener" class="rounded-lg h-12 px-6 flex items-center gap-2 border-2 border-navy/15 text-navy font-bold hover:border-primary hover:text-primary-dark transition-colors">
+            <Instagram class="size-5" /> Seguici su Instagram
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>(".reel-player").forEach((player) => {
+    const video = player.querySelector<HTMLVideoElement>(".reel-video");
+    const button = player.querySelector<HTMLButtonElement>(".reel-play");
+    if (!video || !button) return;
+
+    button.addEventListener("click", () => {
+      button.hidden = true;
+      video.controls = true;
+      video.play();
+    });
+    video.addEventListener("ended", () => {
+      video.controls = false;
+      video.currentTime = 0;
+      video.load(); // torna alla copertina
+      button.hidden = false;
+    });
+  });
+</script>

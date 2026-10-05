@@ -3,6 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import Navbar from "../components/Navbar.astro";
 import Hero from "../components/Hero.astro";
 import About from "../components/About.astro";
+import Reel from "../components/Reel.astro";
 import Menu from "../components/Menu.astro";
 import Reviews from "../components/Reviews.astro";
 import Reservation from "../components/Reservation.astro";
@@ -17,6 +18,7 @@ import { site } from "../data/site";
   <main>
     <Hero />
     <About />
+    <Reel />
     {site.hasGallery && <Gallery />}
     <Menu />
     <Reviews />
