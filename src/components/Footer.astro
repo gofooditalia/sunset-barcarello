@@ -4,8 +4,8 @@ import { site } from "../data/site";
 const year = new Date().getFullYear();
 ---
 
-<footer class="bg-navy text-white/70 py-10 px-6">
-  <div class="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-sm">
+<footer class="bg-navy text-white/70 pt-10 pb-4 px-6">
+  <div class="max-w-[1200px] mx-auto text-sm">
     <div class="text-center sm:text-left">
       <p class="text-white font-display text-lg">{site.name}</p>
       <p>{site.address.street}, {site.address.zip} {site.address.city}</p>
@@ -23,9 +23,11 @@ const year = new Date().getFullYear();
       </div>
       <p class="mt-1">© {year} {site.legal.companyName} · P.IVA {site.legal.vatNumber}</p>
     </div>
-    <a href="https://gofoodmenu.it" target="_blank" rel="noopener" class="flex items-center gap-2 hover:text-white transition-colors">
-      <span>Sviluppato da</span>
-      <img src="/gofood.svg" alt="GO!Food Italia" width="24" height="24" class="h-6 w-auto" />
+  </div>
+  <div class="max-w-[1200px] mx-auto mt-8 pt-3 border-t border-white/10 flex justify-center">
+    <a href="https://gofood.it" target="_blank" rel="noopener" title="GO!Food Italia – software e siti web a Palermo" class="flex items-center gap-1 text-[10px] text-white/35 hover:text-white/80 transition-colors">
+      <span class="whitespace-nowrap">Sito realizzato da</span>
+      <img src="/gofood.svg" alt="GO!Food Italia" width="26" height="20" class="h-5 w-auto shrink-0 opacity-80" />
     </a>
   </div>
 </footer>

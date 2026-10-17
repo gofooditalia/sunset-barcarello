@@ -38,4 +38,4 @@ Il link `/menu` reindirizza al menu digitale GO!Food già live: https://www.gofo
 
 ## 👨‍💻 Developed by
 
-Sviluppato da [GO!Food Italia](https://gofoodmenu.it).
+Sito realizzato da [GO!Food Italia](https://gofood.it).
